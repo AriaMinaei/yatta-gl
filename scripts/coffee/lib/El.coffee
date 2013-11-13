@@ -1,27 +1,21 @@
-define ['./Scene'], (Scene) ->
+{classic} = require 'utila'
 
-	class El
+classic.mixing module.exports = class El
 
-		constructor: ->
+	constructor: ->
 
-			@_children = []
+		@_children = []
 
-			@parent = []
+		@parent = []
 
-			@scene = null
+		@scene = null
 
+	putIn: (sceneOrEl) ->
 
+		sceneOrEl.adopt @
 
-		putIn: (sceneOrEl) ->
+		@parent = sceneOrEl
 
-			sceneOrEl.adopt @
+		@scene = sceneOrEl.scene
 
-			@parent = sceneOrEl
-
-			@scene = sceneOrEl.scene
-
-			@
-
-
-
-
+		@
