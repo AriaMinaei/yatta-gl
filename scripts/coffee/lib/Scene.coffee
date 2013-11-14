@@ -3,7 +3,35 @@ Gila = require '_gila'
 
 module.exports = class Scene
 
+	self = @
+
+	@_defaultScene: null
+
+	@setDefaultScene: (scene) ->
+
+		self._defaultScene = scene
+
+		return
+
+	@_defaultContainer: null
+
+	@setDefaultContainer: (el) ->
+
+		self._defaultContainer = el
+
+		return
+
+	@getDefaultContainer: ->
+
+		self._defaultContainer
+
 	constructor: (idOrCanvas, debug = no) ->
+
+		unless self._defaultScene?
+
+			self.setDefaultScene @
+
+			self.setDefaultContainer @
 
 		@_dims =
 
