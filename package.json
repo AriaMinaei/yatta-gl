@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Yatta in WebGL",
   "main": "scripts/js/lib/YattaGL.js",
-  "dependencies": {},
+  "dependencies": {
+    "gl-matrix": "~2.0.0"
+  },
   "devDependencies": {
     "coffee-script": "~1.6.3"
   },

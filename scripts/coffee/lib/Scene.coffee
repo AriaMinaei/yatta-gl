@@ -1,5 +1,7 @@
 Timing = require 'raf-timing'
-Gila = require '_gila'
+Camera = require './Camera'
+Gila = require 'gila'
+
 
 module.exports = class Scene
 
@@ -139,3 +141,4 @@ module.exports = class Scene
 		@_children.push el
 
 		return
+
