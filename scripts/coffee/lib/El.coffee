@@ -12,10 +12,12 @@ classic.mixing module.exports = class El
 
 	putIn: (sceneOrEl) ->
 
-		sceneOrEl.adopt @
+		sceneOrEl._adopt @
 
 		@parent = sceneOrEl
 
 		@scene = sceneOrEl.scene
+
+		@_timing = @scene.timing
 
 		@
