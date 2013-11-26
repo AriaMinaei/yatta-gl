@@ -2,13 +2,12 @@
 .htaccess
 
 xeno/**
-scripts/coffee/pg/**
 node_modules
+scripts/dist
 
 -p
 
 npm-debug.log
 !*.gitkeep
 
-vendor/**
-pg-html/**
+pg

@@ -1,3 +1,5 @@
+Scene = require './Scene'
+
 module.exports = class _El
 
 	constructor: ->
@@ -34,9 +36,12 @@ module.exports = class _El
 
 		@
 
+	# This gets called when element is put inside another element
 	_respondToParentChange: ->
 
 		throw Error "Any class extending _El must respond to parent change in
 			some way"
 
-Scene = require './Scene'
+	_redraw: ->
+
+		throw Error "Element has not implemented _redraw()"

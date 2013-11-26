@@ -1,7 +1,5 @@
 Timing = require 'raf-timing'
-Camera = require './Camera'
 Gila = require 'gila'
-
 
 module.exports = class Scene
 
@@ -57,17 +55,15 @@ module.exports = class Scene
 
 	_initTiming: ->
 
-		@_shouldRedraw = no
-
-		@timing = new Timing
-
-		@_rafId = 0
-
 		@_boundTick = (t) =>
 
 			@_tick t
 
 			return
+
+		@timing = new Timing
+
+		@_rafId = Timing.requestAnimationFrame @_boundTick
 
 		do @_scheduleRedraw
 
@@ -75,11 +71,31 @@ module.exports = class Scene
 
 	_tick: (t) ->
 
-		@_shouldRedraw = no
+		@_rafId = Timing.requestAnimationFrame @_boundTick
 
-		@_gila.clear()
+		@timing.tick t
+
+		if @_shouldRedraw
+
+			@_shouldRedraw = no
+
+			do @_redraw
+
+		return
+
+	_redraw: ->
+
+		@_gila.clearFrameBuffer()
 
 		child.redraw() for child in @_children
+
+		return
+
+	_scheduleRedraw: ->
+
+		return if @_shouldRedraw
+
+		@_shouldRedraw = yes
 
 		return
 
@@ -120,17 +136,7 @@ module.exports = class Scene
 
 		@_gila.setViewportDims 0, 0, @_dims.width, @_dims.height
 
-		@_gila.clearColor 0, 0, 0, 0
-
-		return
-
-	_scheduleRedraw: ->
-
-		return if @_shouldRedraw
-
-		@_shouldRedraw = yes
-
-		@_rafId = Timing.requestAnimationFrame @_boundTick
+		@_gila.setClearColor 0, 0, 0, 1
 
 		return
 
@@ -141,4 +147,3 @@ module.exports = class Scene
 		@_children.push el
 
 		return
-
