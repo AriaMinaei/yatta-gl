@@ -5,6 +5,8 @@ module.exports = class Scene
 
 	self = @
 
+	@_scenes: []
+
 	@_defaultScene: null
 
 	@setDefaultScene: (scene) ->
@@ -12,6 +14,10 @@ module.exports = class Scene
 		self._defaultScene = scene
 
 		return
+
+	@getDefaultScene: ->
+
+		self._defaultScene
 
 	@_defaultContainer: null
 
@@ -26,6 +32,12 @@ module.exports = class Scene
 		self._defaultContainer
 
 	constructor: (idOrCanvas, debug = no) ->
+
+		@_scene = @
+
+		@id = self._scenes.length
+
+		self._scenes.push @
 
 		unless self._defaultScene?
 
@@ -43,7 +55,7 @@ module.exports = class Scene
 			# then we wouldn't want the size of our elements which are set
 			# according to our resolution to change.
 			perceivedWidth: 0
-			parceivedHeight: 0
+			perceivedHeight: 0
 
 		@debug = Boolean debug
 
@@ -87,7 +99,7 @@ module.exports = class Scene
 
 		@_gila.clearFrameBuffer()
 
-		child.redraw() for child in @_children
+		child._redraw() for child in @_children
 
 		return
 
@@ -124,13 +136,13 @@ module.exports = class Scene
 		@_dims.height = canvas.height
 
 		@_dims.perceivedWidth = canvas.width
-		@_dims.parceivedHeight = canvas.height
+		@_dims.perceivedHeight = canvas.height
 
-		do @_prepareGila
+		do @_initGila
 
 		return
 
-	_prepareGila: ->
+	_initGila: ->
 
 		@_gila = new Gila @canvas, @debug
 

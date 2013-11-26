@@ -20,7 +20,9 @@ module.exports = class _El
 
 		@parent = null
 
-		@scene = null
+		@_scene = null
+
+		@gila = null
 
 	putIn: (sceneOrEl) ->
 
@@ -28,9 +30,11 @@ module.exports = class _El
 
 		@parent = sceneOrEl
 
-		@scene = sceneOrEl.scene
+		@_scene = sceneOrEl._scene
 
-		@_timing = @scene.timing
+		@_timing = @_scene.timing
+
+		@_gila = @_scene._gila
 
 		do @_respondToParentChange
 
@@ -39,8 +43,7 @@ module.exports = class _El
 	# This gets called when element is put inside another element
 	_respondToParentChange: ->
 
-		throw Error "Any class extending _El must respond to parent change in
-			some way"
+		throw Error 'Any class extending _El must respond to parent change in some way'
 
 	_redraw: ->
 
