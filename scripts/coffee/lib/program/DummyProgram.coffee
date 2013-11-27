@@ -40,15 +40,15 @@ module.exports = class DummyProgram extends _Program
 
 		do @_activate
 
-		@_vertexPosisionAttr = @_program.attr 'aVertexPosition'
+		@_vertexPositionAttr = @_program.attr 'aVertexPosition'
 
-		@_vertexPosisionAttr.enable()
+		@_vertexPositionAttr.enable()
 
-		@_vertexPositionBuffer = @_gila.makeBuffer()
+		@_vertexPositionBuffer = @_gila.makeArrayBuffer()
 
-		@_fixSizeUniform = @_program.uniform 'uFixSize'
+		@_fixSizeUniform = @_program.uniform '3f', 'uFixSize'
 
-		@_fixPosUniform = @_program.uniform 'uFixPos'
+		@_fixPosUniform = @_program.uniform '3f', 'uFixPos'
 
 	setVertices: (v) ->
 
@@ -60,7 +60,7 @@ module.exports = class DummyProgram extends _Program
 
 	_activate: ->
 
-		@_program.goInUse()
+		@_program.activate()
 
 		return
 
@@ -78,16 +78,16 @@ module.exports = class DummyProgram extends _Program
 		fixSizeY = @_height / @_screenHeight
 		fixSizeZ = 1
 
-		@_fixSizeUniform.set3f fixSizeX, fixSizeY, fixSizeZ
+		@_fixSizeUniform.set fixSizeX, fixSizeY, fixSizeZ
 
 		fixPosX = @_x / @_screenWidth * 2 - 1
 		fixPosY = @_y / @_screenHeight * 2 - 1
 		fixPosZ = 0
 
-		@_fixPosUniform.set3f fixPosX, fixPosY, fixPosZ
+		@_fixPosUniform.set fixPosX, fixPosY, fixPosZ
 
 		do @_vertexPositionBuffer.bind
 
-		@_vertexPosisionAttr.readFromBuffer 3, 'FLOAT', no, 0, 0
+		@_vertexPositionAttr.readAsFloat 3, no, 0, 0
 
-		@_gila.drawArrays 'TRIANGLES', 0, 6
+		@_gila.drawTriangles 0, 6

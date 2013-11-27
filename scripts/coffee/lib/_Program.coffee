@@ -4,7 +4,7 @@ module.exports = class _Program
 
 		self = @constructor
 
-		# Let's make sure uses only one instance of every program
+		# make sure we use only one instance of every program
 		sceneId = el._scene.id
 
 		if self._instances?

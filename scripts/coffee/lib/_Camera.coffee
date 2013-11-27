@@ -1,5 +1,4 @@
 _El = require './_El'
-{mat4} = require 'gl-matrix'
 
 module.exports = class _Camera extends _El
 
