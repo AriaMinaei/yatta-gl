@@ -53,3 +53,9 @@ module.exports = class _El
 	_redraw: ->
 
 		throw Error "Element has not implemented _redraw()"
+
+	_scheduleRedraw: ->
+
+		if @_scene? then do @_scene._scheduleRedraw
+
+		return

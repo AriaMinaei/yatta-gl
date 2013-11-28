@@ -9,7 +9,7 @@ module.exports = class Transformation
 
 		@_localMatrix = mat4.create()
 
-		@_lastApiChangeTime = -1
+		@_lastApiChangeTime = 0
 
 		@_lastLocalMatrixUpdateTime = -1
 
@@ -23,9 +23,13 @@ module.exports = class Transformation
 
 			do @_calculateLocalMatrix
 
-			@_lastLocalMatrixUpdateTime = @el._timing.tickNumber
+			@_lastLocalMatrixUpdateTime = @_getTickNumber()
 
 		@_localMatrix
+
+	_getTickNumber: ->
+
+		@el._timing.tickNumber
 
 	_calculateLocalMatrix: ->
 
@@ -33,7 +37,7 @@ module.exports = class Transformation
 
 		props = @api._current
 
-		out = @_localMatrix
+		out = mat4.identity @_localMatrix
 
 		if has.movement
 
@@ -58,7 +62,9 @@ module.exports = class Transformation
 
 					toExpose[name] = ->
 
-						@_transformation._lastApiChangeTime = @_timing.tickNumber
+						do @_scheduleRedraw
+
+						@_transformation._lastApiChangeTime = @_transformation._getTickNumber()
 
 						func.apply @_transformation.api, arguments
 

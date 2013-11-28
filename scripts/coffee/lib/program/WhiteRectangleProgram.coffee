@@ -58,11 +58,11 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@_transUniform = @_program.uniform 'mat4', 'uTrans'
 
-	setDims: (x, y) ->
+	setDims: (dimsArray) ->
 
-		@_dims[0] = x
+		@_dims[0] = dimsArray[0]
 
-		@_dims[1] = y
+		@_dims[1] = dimsArray[1]
 
 		@
 

@@ -1,5 +1,6 @@
 _BasicElement = require './_BasicElement'
 WhiteRectangleProgram = require '../program/WhiteRectangleProgram'
+Dims2D = require './property/Dims2D'
 
 module.exports = class WhiteRectangle extends _BasicElement
 
@@ -7,9 +8,9 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		super
 
-		@_program = null
+		@_dims = new Dims2D
 
-		@_transformation.api.move 0.1, 0, 0
+		@_program = null
 
 	_getProgram: ->
 
@@ -35,7 +36,7 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		p = @_getProgram()
 
-		p.setDims 0.99, 0.1
+		p.setDims @_dims.getDims()
 
 		p.setTransformation @_transformation.getMatrix()
 
@@ -43,4 +44,4 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		return
 
-window.w = WhiteRectangle
+	@_methodsToExpose: [Dims2D._methodsToExpose]
