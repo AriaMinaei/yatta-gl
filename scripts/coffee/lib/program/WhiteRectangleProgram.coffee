@@ -37,13 +37,13 @@ module.exports = class WhiteRectangleProgram extends _Program
 		 1,  1, 0
 	]
 
-	constructor: ->
-
-		super
+	_init: ->
 
 		@_dims = new Float32Array 2
 
 		@_transformation = null
+
+		console.log @
 
 		@_program = @_gila.makeProgram vert, frag, 'whiteRectangleProgram'
 

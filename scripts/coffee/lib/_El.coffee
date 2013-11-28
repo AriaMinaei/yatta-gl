@@ -45,6 +45,14 @@ module.exports = class _El
 
 		@
 
+	_adopt: (el) ->
+
+		do @_scheduleRedraw
+
+		@_children.push el
+
+		return
+
 	# This gets called when element is put inside another element
 	_respondToParentChange: ->
 

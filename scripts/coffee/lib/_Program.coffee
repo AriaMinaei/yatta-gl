@@ -22,3 +22,5 @@ module.exports = class _Program
 		@_scene = el._scene
 
 		@_gila = el._scene._gila
+
+		@_init.apply @, arguments

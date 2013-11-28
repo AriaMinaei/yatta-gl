@@ -42,6 +42,8 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		p.draw()
 
+		super
+
 		return
 
 	@_methodsToExpose: [Dims2D._methodsToExpose]
