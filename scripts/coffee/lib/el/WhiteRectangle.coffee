@@ -9,6 +9,8 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		@_program = null
 
+		@_transformation.api.move 0.1, 0, 0
+
 	_getProgram: ->
 
 		unless @_program?
@@ -35,6 +37,10 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		p.setDims 0.99, 0.1
 
+		p.setTransformation @_transformation.getMatrix()
+
 		p.draw()
 
 		return
+
+window.w = WhiteRectangle

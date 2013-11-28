@@ -1,8 +1,13 @@
 Scene = require './Scene'
+exposeMethods = require './utility/exposeMethods'
 
 module.exports = class _El
 
+	self = @
+
 	constructor: ->
+
+		exposeMethods @
 
 		defaultScene = Scene.getDefaultScene()
 

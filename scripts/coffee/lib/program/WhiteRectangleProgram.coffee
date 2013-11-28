@@ -5,8 +5,10 @@ attribute vec3 vx;
 
 uniform vec2 uDims;
 
+uniform mat4 uTrans;
+
 void main(void) {
-	gl_Position = vec4(vx, 1) * vec4(uDims, 1, 1);
+	gl_Position = uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1));
 }
 """
 
@@ -54,6 +56,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@_dimsUniform = @_program.uniform '2f', 'uDims'
 
+		@_transUniform = @_program.uniform 'mat4', 'uTrans'
+
 	setDims: (x, y) ->
 
 		@_dims[0] = x
@@ -87,6 +91,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 		do @_activate
 
 		@_dimsUniform.set @_dims[0], @_dims[1]
+
+		@_transUniform.set @_transformation
 
 		@_vxBuffer.data self._vertices
 
