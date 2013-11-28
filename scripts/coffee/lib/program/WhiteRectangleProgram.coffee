@@ -8,7 +8,8 @@ uniform vec2 uDims;
 uniform mat4 uTrans;
 
 void main(void) {
-	gl_Position = uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1));
+	gl_Position = uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1)) * vec4(0.5, 1, 1, 1);
+	//gl_Position = uTrans * vec4(vx, 1);
 }
 """
 
@@ -54,6 +55,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@_vxBuffer = @_gila.makeArrayBuffer()
 
+		@_vxBuffer.data self._vertices
+
 		@_dimsUniform = @_program.uniform '2f', 'uDims'
 
 		@_transUniform = @_program.uniform 'mat4', 'uTrans'
@@ -90,11 +93,11 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		do @_activate
 
-		@_dimsUniform.set @_dims[0], @_dims[1]
+		@_dimsUniform.fromArray @_dims
 
 		@_transUniform.set @_transformation
 
-		@_vxBuffer.data self._vertices
+		@_vxBuffer.bind()
 
 		@_vxAttr.readAsFloat 3, no, 0, 0
 

@@ -81,6 +81,24 @@ module.exports = class Scene
 
 		return
 
+	eachFrame: (cb) ->
+
+		func = (t) ->
+
+			cb t, cancel
+
+			return
+
+		cancel = ->
+
+			@timing.cancelBeforeEachFrame func
+
+			return
+
+		@timing.beforeEachFrame func
+
+		@
+
 	_tick: (t) ->
 
 		@_rafId = Timing.requestAnimationFrame @_boundTick

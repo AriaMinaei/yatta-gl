@@ -59,3 +59,9 @@ module.exports = class _El
 		if @_scene? then do @_scene._scheduleRedraw
 
 		return
+
+	_getTickNumber: ->
+
+		return @_timing.tickNumber if @_timing?
+
+		return 0

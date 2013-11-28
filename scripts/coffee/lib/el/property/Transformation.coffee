@@ -1,5 +1,6 @@
-TransformationApi = require 'transformation'
+matrixify = require 'transformation/scripts/js/lib/matrixify'
 {mat4, vec3} = require 'gl-matrix'
+TransformationApi = require 'transformation'
 
 module.exports = class Transformation
 
@@ -19,7 +20,7 @@ module.exports = class Transformation
 
 	_getLocalMatrix: ->
 
-		if @_lastApiChangeTime > @_lastLocalMatrixUpdateTime
+		if @_lastApiChangeTime isnt @_lastLocalMatrixUpdateTime
 
 			do @_calculateLocalMatrix
 
@@ -29,19 +30,15 @@ module.exports = class Transformation
 
 	_getTickNumber: ->
 
-		@el._timing.tickNumber
+		@el._getTickNumber()
 
 	_calculateLocalMatrix: ->
 
 		has = @api._has
 
-		props = @api._current
-
 		out = mat4.identity @_localMatrix
 
-		if has.movement
-
-			mat4.translate out, out, [props[0], props[1], props[2]]
+		matrixify.convert out, @api
 
 		out
 
@@ -64,7 +61,7 @@ module.exports = class Transformation
 
 						do @_scheduleRedraw
 
-						@_transformation._lastApiChangeTime = @_transformation._getTickNumber()
+						@_transformation._lastApiChangeTime = @_getTickNumber()
 
 						func.apply @_transformation.api, arguments
 
