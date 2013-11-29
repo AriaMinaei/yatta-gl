@@ -21,6 +21,12 @@ module.exports = class _Program
 
 		@_scene = el._scene
 
+		@_timing = @_scene.timing
+
 		@_gila = el._scene._gila
 
 		@_init.apply @, arguments
+
+	_getTickNumber: ->
+
+		@_timing.tickNumber

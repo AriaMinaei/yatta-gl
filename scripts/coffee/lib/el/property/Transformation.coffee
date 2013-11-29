@@ -1,5 +1,5 @@
 matrixify = require 'transformation/scripts/js/lib/matrixify'
-{mat4, vec3} = require 'gl-matrix'
+{mat4} = require 'gl-matrix/src/gl-matrix/mat4'
 TransformationApi = require 'transformation'
 
 module.exports = class Transformation
@@ -14,9 +14,11 @@ module.exports = class Transformation
 
 		@_lastLocalMatrixUpdateTime = -1
 
+		@_finalMatrix = mat4.create()
+
 	getMatrix: ->
 
-		localMatrix = @_getLocalMatrix()
+		do @_getFinalMatrix
 
 	_getLocalMatrix: ->
 
@@ -41,6 +43,22 @@ module.exports = class Transformation
 		matrixify.convert out, @api
 
 		out
+
+	_getFinalMatrix: ->
+
+		do @_calculateFinalMatrix
+
+	_calculateFinalMatrix: ->
+
+		unless @el.hasParent()
+
+			return @_getLocalMatrix()
+
+		mat4.multiply @_finalMatrix, @_getParentMatrix(), @_getLocalMatrix()
+
+	_getParentMatrix: ->
+
+		@el.parent._transformation.getMatrix()
 
 	@_methodsToExpose: do ->
 

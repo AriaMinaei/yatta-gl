@@ -65,6 +65,12 @@ module.exports = class Scene
 
 		do @_initTiming
 
+		@_currentCamera = new Perspective
+
+	getCurrentCamera: ->
+
+		@_currentCamera
+
 	_initTiming: ->
 
 		@_boundTick = (t) =>
@@ -177,3 +183,5 @@ module.exports = class Scene
 		@_children.push el
 
 		return
+
+Perspective = require './camera/Perspective'

@@ -1,4 +1,3 @@
-Scene = require './Scene'
 exposeMethods = require './utility/exposeMethods'
 
 module.exports = class _El
@@ -33,7 +32,13 @@ module.exports = class _El
 
 		sceneOrEl._adopt @
 
-		@parent = sceneOrEl
+		if sceneOrEl instanceof _El
+
+			@parent = sceneOrEl
+
+		else
+
+			@parent = null
 
 		@_scene = sceneOrEl._scene
 
@@ -73,3 +78,9 @@ module.exports = class _El
 		return @_timing.tickNumber if @_timing?
 
 		return 0
+
+	hasParent: ->
+
+		@parent?
+
+Scene = require './Scene'

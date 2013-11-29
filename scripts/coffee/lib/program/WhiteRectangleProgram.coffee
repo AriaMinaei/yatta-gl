@@ -7,8 +7,10 @@ uniform vec2 uDims;
 
 uniform mat4 uTrans;
 
+uniform mat4 uPers;
+
 void main(void) {
-	gl_Position = uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1)) * vec4(0.5, 1, 1, 1);
+	gl_Position = uPers * uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1)); // * vec4(0.5, 1, 1, 1);
 	//gl_Position = uTrans * vec4(vx, 1);
 }
 """
@@ -43,7 +45,11 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@_transformation = null
 
-		console.log @
+		@_perspective = null
+
+		@_shouldUpdatePerspective = yes
+
+		@_lastPerspectiveUploadTime = -1
 
 		@_program = @_gila.makeProgram vert, frag, 'whiteRectangleProgram'
 
@@ -61,6 +67,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@_transUniform = @_program.uniform 'mat4', 'uTrans'
 
+		@_persUniform = @_program.uniform 'mat4', 'uPers'
+
 	setDims: (dimsArray) ->
 
 		@_dims[0] = dimsArray[0]
@@ -72,6 +80,22 @@ module.exports = class WhiteRectangleProgram extends _Program
 	setTransformation: (t) ->
 
 		@_transformation = t
+
+		@
+
+	setPerspective: (p) ->
+
+		if p is @_perspective
+
+			if not p.lastUpdateTime? or p.lastUpdateTime > @_lastPerspectiveUploadTime
+
+				@_shouldUpdatePerspective = yes
+
+			return @
+
+		@_perspective = p
+
+		@_shouldUpdatePerspective = yes
 
 		@
 
@@ -89,6 +113,18 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		return
 
+	_uploadPerspective: ->
+
+		if @_shouldUpdatePerspective
+
+			@_lastPerspectiveUploadTime = @_getTickNumber()
+
+			@_persUniform.set @_perspective
+
+		@_shouldUpdatePerspective = no
+
+		return
+
 	draw: ->
 
 		do @_activate
@@ -96,6 +132,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 		@_dimsUniform.fromArray @_dims
 
 		@_transUniform.set @_transformation
+
+		do @_uploadPerspective
 
 		@_vxBuffer.bind()
 

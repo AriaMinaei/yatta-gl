@@ -40,6 +40,8 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		p.setTransformation @_transformation.getMatrix()
 
+		p.setPerspective @_getCameraPerspective()
+
 		p.draw()
 
 		super

@@ -15,4 +15,8 @@ module.exports = class _BasicElement extends _El
 
 		return
 
+	_getCameraPerspective: ->
+
+		@_scene._currentCamera._getPerspectiveMatrix()
+
 	@_methodsToExpose: [Transformation._methodsToExpose]
