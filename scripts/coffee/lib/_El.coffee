@@ -26,7 +26,7 @@ module.exports = class _El
 
 		@_scene = null
 
-		@gila = null
+		@_gila = null
 
 	putIn: (sceneOrEl) ->
 

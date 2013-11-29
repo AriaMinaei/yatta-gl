@@ -174,6 +174,14 @@ module.exports = class Scene
 
 		@_gila.setClearColor 0, 0, 0, 1
 
+		@_gila.enableBlending()
+
+		gl = @_gila.gl
+
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+
+		window.g = @_gila
+
 		return
 
 	_adopt: (el) ->

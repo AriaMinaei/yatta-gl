@@ -1,27 +1,6 @@
 _Program = require '../_Program'
 
-vert = """
-attribute vec3 vx;
-
-uniform vec2 uDims;
-
-uniform mat4 uTrans;
-
-uniform mat4 uPers;
-
-void main(void) {
-	gl_Position = uPers * uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1)); // * vec4(0.5, 1, 1, 1);
-	//gl_Position = uTrans * vec4(vx, 1);
-}
-"""
-
-frag = """
-precision mediump float;
-
-void main() {
-	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
-}
-"""
+{vert, frag} = require './whiteRectangleProgram/shaders'
 
 module.exports = class WhiteRectangleProgram extends _Program
 
@@ -51,6 +30,10 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@_lastPerspectiveUploadTime = -1
 
+		@_hasTexture = no
+
+		@_texture = null
+
 		@_program = @_gila.makeProgram vert, frag, 'whiteRectangleProgram'
 
 		@_program.activate()
@@ -68,6 +51,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 		@_transUniform = @_program.uniform 'mat4', 'uTrans'
 
 		@_persUniform = @_program.uniform 'mat4', 'uPers'
+
+		@_textureSlotUniform = @_program.uniform '1i', 'textureSlot'
 
 	setDims: (dimsArray) ->
 
@@ -105,7 +90,19 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		@setTransformation null
 
+		@_hasTexture = no
+
+		@_texture = null
+
 		return
+
+	useTexture: (texture) ->
+
+		@_hasTexture = yes
+
+		@_texture = texture
+
+		@
 
 	_activate: ->
 
@@ -125,6 +122,18 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		return
 
+	_setTextureUniforms: ->
+
+		unless @_texture?
+
+			throw Error "no texture!"
+
+		@_texture.assignToSlot 0
+
+		@_textureSlotUniform.set 0
+
+		return
+
 	draw: ->
 
 		do @_activate
@@ -134,6 +143,8 @@ module.exports = class WhiteRectangleProgram extends _Program
 		@_transUniform.set @_transformation
 
 		do @_uploadPerspective
+
+		do @_setTextureUniforms
 
 		@_vxBuffer.bind()
 

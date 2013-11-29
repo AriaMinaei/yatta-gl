@@ -12,6 +12,8 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		@_program = null
 
+		@_texture = null
+
 	_getProgram: ->
 
 		unless @_program?
@@ -32,6 +34,14 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		do @_getProgram
 
+	_getTexture: ->
+
+		unless @_texture?
+
+			@_texture = @_gila.makeTexture './gloop.png'
+
+		return @_texture
+
 	_redraw: ->
 
 		p = @_getProgram()
@@ -41,6 +51,8 @@ module.exports = class WhiteRectangle extends _BasicElement
 		p.setTransformation @_transformation.getMatrix()
 
 		p.setPerspective @_getCameraPerspective()
+
+		p.useTexture @_getTexture()
 
 		p.draw()
 
