@@ -38,7 +38,7 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		unless @_texture?
 
-			@_texture = @_gila.makeTexture './gloop.png'
+			@_texture = @_scene._textureRepo.get './gloop.png'
 
 		return @_texture
 

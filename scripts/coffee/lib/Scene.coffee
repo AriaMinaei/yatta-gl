@@ -1,3 +1,4 @@
+TextureRepo = require './TextureRepo'
 Timing = require 'raf-timing'
 Gila = require 'gila'
 
@@ -64,6 +65,8 @@ module.exports = class Scene
 		@_children = []
 
 		do @_initTiming
+
+		@_textureRepo = new TextureRepo @
 
 		@_currentCamera = new Perspective
 
@@ -179,8 +182,6 @@ module.exports = class Scene
 		gl = @_gila.gl
 
 		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
-
-		window.g = @_gila
 
 		return
 
