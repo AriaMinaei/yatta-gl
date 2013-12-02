@@ -38,6 +38,8 @@ module.exports = class ParticlePainter extends _Painter
 
 			texture: null
 
+			textureFillChannel: 0
+
 		@_vx =
 
 			attr: @_program.attr 'vx'
@@ -57,6 +59,8 @@ module.exports = class ParticlePainter extends _Painter
 			pers: @_program.uniform 'mat4', 'uPers'
 
 			textureSlot: @_program.uniform '1i', 'textureSlot'
+
+			textureFillChannel: @_program.uniform '1i', 'textureFillChannel'
 
 	setDims: (dimsArray) ->
 
@@ -92,6 +96,8 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_props.texture = texture
 
+		@_props.textureFillChannel = channel
+
 		@
 
 	_reset: ->
@@ -101,6 +107,8 @@ module.exports = class ParticlePainter extends _Painter
 		@setTransformation null
 
 		@_props.texture = null
+
+		@_props.textureFillChannel = 3
 
 		return
 
@@ -131,6 +139,8 @@ module.exports = class ParticlePainter extends _Painter
 		@_props.texture.assignToSlot 0
 
 		@_uniforms.textureSlot.set 0
+
+		@_uniforms.textureFillChannel.set @_props.textureFillChannel
 
 		return
 

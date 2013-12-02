@@ -2,7 +2,7 @@ ParticlePainter = require '../painter/ParticlePainter'
 _BasicElement = require './_BasicElement'
 Dims2D = require './property/Dims2D'
 
-[ALL, RED, GREEN, BLUE] = [0, 1, 2, 3]
+[RED, GREEN, BLUE, ALL] = [0, 1, 2, 3]
 
 module.exports = class Particle extends _BasicElement
 
@@ -34,7 +34,7 @@ module.exports = class Particle extends _BasicElement
 
 		if @_gila.debug and channel not in [ALL, RED, GREEN, BLUE]
 
-			throw Error "`channel` must be an integer either 0(all), 1(red), 2(green), 3(blue)"
+			throw Error "`channel` must be an integer either 0(red), 1(green), 2(blue), 3(all)"
 
 		@_texture.channel = channel
 

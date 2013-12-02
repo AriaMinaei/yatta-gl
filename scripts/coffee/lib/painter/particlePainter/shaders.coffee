@@ -23,11 +23,19 @@ varying vec2 vTextureCoord;
 
 uniform sampler2D textureSlot;
 
+uniform int textureFillChannel;
+
 void main() {
-	//if (hasTexture == 1) {
+
+	if (textureFillChannel == 0) {
+		gl_FragColor = vec4(texture2D(textureSlot, vTextureCoord).r);
+	} else if (textureFillChannel == 1) {
+		gl_FragColor = vec4(texture2D(textureSlot, vTextureCoord).g);
+	} else if (textureFillChannel == 2) {
+		gl_FragColor = vec4(texture2D(textureSlot, vTextureCoord).b);
+	} else {
 		gl_FragColor = texture2D(textureSlot, vTextureCoord);
-	//} else {
-	//	gl_FragColor = vec4(1.0, 1.0, 0.5, 1.0);
-	//}
+	}
+
 }
 """

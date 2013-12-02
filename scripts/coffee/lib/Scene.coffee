@@ -146,7 +146,7 @@ module.exports = class Scene
 
 		@_gila.setViewportDims 0, 0, @_dims.width, @_dims.height
 
-		@_gila.setClearColor 0, 0, 0, 1
+		@_gila.setClearColor 0, 0, 0.1, 1
 
 		@_gila.blending.enable()
 
