@@ -8,30 +8,6 @@ module.exports = class Scene
 
 	@_scenes: []
 
-	@_defaultScene: null
-
-	@setDefaultScene: (scene) ->
-
-		self._defaultScene = scene
-
-		return
-
-	@getDefaultScene: ->
-
-		self._defaultScene
-
-	@_defaultContainer: null
-
-	@setDefaultContainer: (el) ->
-
-		self._defaultContainer = el
-
-		return
-
-	@getDefaultContainer: ->
-
-		self._defaultContainer
-
 	constructor: (idOrCanvas, debug = no) ->
 
 		@_scene = @
@@ -40,11 +16,6 @@ module.exports = class Scene
 
 		self._scenes.push @
 
-		unless self._defaultScene?
-
-			self.setDefaultScene @
-
-			self.setDefaultContainer @
 
 		@_dims =
 
@@ -68,7 +39,7 @@ module.exports = class Scene
 
 		@_textureRepo = new TextureRepo @
 
-		@_currentCamera = new Perspective
+		@_currentCamera = new Perspective @
 
 	getCurrentCamera: ->
 
@@ -177,11 +148,12 @@ module.exports = class Scene
 
 		@_gila.setClearColor 0, 0, 0, 1
 
-		@_gila.enableBlending()
+		@_gila.blending.enable()
 
-		gl = @_gila.gl
-
-		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA)
+		@_gila.blend
+		.src.srcAlpha()
+		.dst.oneMinusSrcAlpha()
+		.update()
 
 		return
 

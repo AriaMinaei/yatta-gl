@@ -1,5 +1,5 @@
+WhiteRectanglePainter = require '../painter/WhiteRectanglePainter'
 _BasicElement = require './_BasicElement'
-WhiteRectangleProgram = require '../program/WhiteRectangleProgram'
 Dims2D = require './property/Dims2D'
 
 module.exports = class WhiteRectangle extends _BasicElement
@@ -10,17 +10,17 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		@_dims = new Dims2D
 
-		@_program = null
+		@_painter = null
 
 		@_texture = null
 
-	_getProgram: ->
+	_getPainter: ->
 
-		unless @_program?
+		unless @_painter?
 
-			@_program = new WhiteRectangleProgram @
+			@_painter = new WhiteRectanglePainter @
 
-		@_program
+		@_painter
 
 	_respondToParentChange: ->
 
@@ -30,9 +30,9 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 	_resetProgram: ->
 
-		@_program = null
+		@_painter = null
 
-		do @_getProgram
+		do @_getPainter
 
 	_getTexture: ->
 
@@ -44,7 +44,7 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 	_redraw: ->
 
-		p = @_getProgram()
+		p = @_getPainter()
 
 		p.setDims @_dims.getDims()
 
@@ -54,7 +54,7 @@ module.exports = class WhiteRectangle extends _BasicElement
 
 		p.useTexture @_getTexture()
 
-		p.draw()
+		p.paint()
 
 		super
 

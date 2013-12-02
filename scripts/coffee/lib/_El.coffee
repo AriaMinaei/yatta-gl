@@ -4,29 +4,13 @@ module.exports = class _El
 
 	self = @
 
-	constructor: ->
+	constructor: (scene) ->
 
 		exposeMethods @
 
-		defaultScene = Scene.getDefaultScene()
-
-		if defaultScene?
-
-			defaultScene.timing.nextTick =>
-
-				if not @parent? and defaultContainer = Scene.getDefaultContainer()
-
-					@putIn defaultContainer
-
-				return
-
 		@_children = []
 
-		@parent = null
-
-		@_scene = null
-
-		@_gila = null
+		@putIn scene
 
 	putIn: (sceneOrEl) ->
 

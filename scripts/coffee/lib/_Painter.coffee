@@ -1,4 +1,4 @@
-module.exports = class _Program
+module.exports = class _Painter
 
 	constructor: (el) ->
 

@@ -1,8 +1,8 @@
-_Program = require '../_Program'
+_Painter = require '../_Painter'
 
-{vert, frag} = require './whiteRectangleProgram/shaders'
+{vert, frag} = require './whiteRectanglePainter/shaders'
 
-module.exports = class WhiteRectangleProgram extends _Program
+module.exports = class WhiteRectanglePainter extends _Painter
 
 	self = @
 
@@ -134,7 +134,7 @@ module.exports = class WhiteRectangleProgram extends _Program
 
 		return
 
-	draw: ->
+	paint: ->
 
 		do @_activate
 

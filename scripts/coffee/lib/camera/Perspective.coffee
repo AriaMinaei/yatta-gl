@@ -5,8 +5,6 @@ module.exports = class Perspective extends _Camera
 
 	constructor: ->
 
-		super
-
 		@_perspectiveMatrix = mat4.create()
 
 		@_perspectiveMatrix.lastUpdateTime = -1
@@ -23,6 +21,8 @@ module.exports = class Perspective extends _Camera
 			near: 0.1
 
 			far: 1000.0
+
+		super
 
 	_reactToPropsChange: ->
 

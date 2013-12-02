@@ -6,7 +6,7 @@ module.exports = class TextureRepo
 
 		t
 		.magnifyWithLinear()
-		.minifyWithLinearMipmapNearest()
+		.minifyWithLinearMipmapLinear()
 
 		return
 
