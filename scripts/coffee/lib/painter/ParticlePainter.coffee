@@ -64,9 +64,7 @@ module.exports = class ParticlePainter extends _Painter
 
 	setDims: (dimsArray) ->
 
-		@_props.dims[0] = dimsArray[0]
-
-		@_props.dims[1] = dimsArray[1]
+		@_props.dims = dimsArray
 
 		@
 
@@ -78,13 +76,13 @@ module.exports = class ParticlePainter extends _Painter
 
 	setPerspective: (p) ->
 
-		if p is @_props.perspective
+		# if p is @_props.perspective
 
-			if not p.lastUpdateTime? or p.lastUpdateTime > @_props.lastPerspectiveUploadTime
+		# 	if not p.lastUpdateTime? or p.lastUpdateTime > @_props.lastPerspectiveUploadTime
 
-				@_props.shouldUpdatePerspective = yes
+		# 		@_props.shouldUpdatePerspective = yes
 
-			return @
+		# 	return @
 
 		@_props.perspective = p
 
@@ -132,10 +130,6 @@ module.exports = class ParticlePainter extends _Painter
 
 	_setTextureUniforms: ->
 
-		unless @_props.texture?
-
-			throw Error "no texture!"
-
 		@_props.texture.assignToSlot 0
 
 		@_uniforms.textureSlot.set 0
@@ -163,6 +157,8 @@ module.exports = class ParticlePainter extends _Painter
 		@_vx.attr.readAsFloat 3, no, 0, 0
 
 		@_gila.drawTriangles 0, 6
+
+		return
 
 	paint: ->
 

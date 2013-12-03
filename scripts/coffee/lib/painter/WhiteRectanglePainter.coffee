@@ -46,6 +46,8 @@ module.exports = class WhiteRectanglePainter extends _Painter
 
 		@_vxBuffer.data self._vertices
 
+		@_vxAttr.readAsFloat 3, no, 0, 0
+
 		@_dimsUniform = @_program.uniform '2f', 'uDims'
 
 		@_transUniform = @_program.uniform 'mat4', 'uTrans'
@@ -148,7 +150,7 @@ module.exports = class WhiteRectanglePainter extends _Painter
 
 		@_vxBuffer.bind()
 
-		@_vxAttr.readAsFloat 3, no, 0, 0
+
 
 		@_gila.drawTriangles 0, 6
 

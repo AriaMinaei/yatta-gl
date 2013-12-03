@@ -76,7 +76,7 @@ module.exports = class Particle extends _BasicElement
 
 		p.paint()
 
-		super
+		do @_redrawChildren
 
 		return
 

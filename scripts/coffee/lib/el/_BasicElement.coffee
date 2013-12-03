@@ -9,11 +9,12 @@ module.exports = class _BasicElement extends _El
 
 		@_transformation = new Transformation @
 
-	_redraw: ->
+	_redrawChildren: ->
 
 		child._redraw() for child in @_children
 
 		return
+
 
 	_getCameraPerspective: ->
 

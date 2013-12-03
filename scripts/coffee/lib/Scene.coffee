@@ -39,11 +39,17 @@ module.exports = class Scene
 
 		@_textureRepo = new TextureRepo @
 
-		@_currentCamera = new Perspective @
+		@_setCurrentCamera new NoCamera @
 
 	getCurrentCamera: ->
 
 		@_currentCamera
+
+	_setCurrentCamera: (cam) ->
+
+		@_currentCamera = cam
+
+		return
 
 	_initTiming: ->
 
@@ -95,7 +101,7 @@ module.exports = class Scene
 
 	_redraw: ->
 
-		@_gila.clearFrameBuffer()
+		@_gila.clear()
 
 		child._redraw() for child in @_children
 
@@ -152,7 +158,7 @@ module.exports = class Scene
 
 		@_gila.blend
 		.src.srcAlpha()
-		.dst.oneMinusSrcAlpha()
+		.dst.one()
 		.update()
 
 		return
@@ -165,4 +171,4 @@ module.exports = class Scene
 
 		return
 
-Perspective = require './camera/Perspective'
+NoCamera = require './camera/NoCamera'
