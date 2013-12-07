@@ -1,38 +1,63 @@
+FloatStruct = require '../utility/FloatStruct'
 _Painter = require '../_Painter'
-
-{vert, frag} = require './awesomeParticlePainter/shaders'
+shaders = require './awesomeParticlePainter/shaders'
 
 module.exports = class AwesomeParticlePainter extends _Painter
 
 	self = @
 
+	_setupDataStructure: ->
+
+		flags = @flags
+
+		@_struct = new FloatStruct
+
+		@_struct.float 'size', 1
+
+		@_struct.float 'pos', 3
+
+		# @_struct.float 'zRotation', 1
+
+		if flags.fillImage
+
+			throw Error "fillImage not implemented yet"
+
+		else if flags.maskOnImage
+
+			throw Error "maskOnImage not implemented yet"
+
+		else
+
+			@_struct.unsignedByte 'color', 4, yes
+
+	makeParamHolder: ->
+
+		do @_struct.makeParamHolder
+
 	_init: (scene, @flags, @index) ->
+
+		do @_setupDataStructure
 
 		@_program = do @_getProgram
 
-		@_uniforms =
+		# @_uniforms =
 
-			# size: @_program.uniform '1f', 'size'
-
-			color: @_program.uniform '3f', 'color'
+			# color: @_program.uniform '3f', 'color'
 
 		@_theBuffer = @_gila.makeArrayBuffer()
-
-		@_attribs =
-
-			pos: @_program.attr('pos').enable()
-
-			size: @_program.attr('size').enable()
-
-		@_floats = new Float32Array [0, 0, 0, 120]
 
 		do @_setupAttribs
 
 
 	_getProgram: ->
 
-		vert = @_gila.getVertexShader 'awesome-particle-shader-vert', vert, @flags
-		frag = @_gila.getFragmentShader 'awesome-particle-shader-frag', frag, @flags
+		vert = @_gila.getVertexShader 'awesome-particle-shader-vert',
+
+			shaders.vert, @flags
+
+		frag = @_gila.getFragmentShader 'awesome-particle-shader-frag',
+
+			shaders.frag, @flags
 
 		@_gila.getProgram vert, frag
 
@@ -42,24 +67,24 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 		@_theBuffer.bind()
 
-		step = Float32Array.BYTES_PER_ELEMENT
+		stride = @_struct.getStride()
 
-		total = 3 + 1
+		for el in @_struct.getElements()
 
-		stride = step * total
+			@_program.attr(el.name).enable()._pointer el.size,
 
-		@_attribs.pos.readAsFloat 3, no, stride, 0
+				el.glType, el.normalized, stride, el.offset
 
-		@_attribs.size.readAsFloat 1, no, stride, step * 3
+		return
 
-	paint: (floats) ->
+	paint: (params) ->
 
-		@_floats[0] += 0.01
+		buffer = params.__buffer
 
 		@_program.activate()
 
-		@_theBuffer.data @_floats
+		@_theBuffer.data buffer
 
-		@_uniforms.color.set 0.5, 0.7, 0.9
+		# @_uniforms.color.set 0.5, 0.7, 0.9
 
 		@_gila.drawPoints 0, 1

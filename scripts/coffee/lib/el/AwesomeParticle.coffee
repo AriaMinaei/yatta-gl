@@ -1,4 +1,3 @@
-dataStructure = require '../painter/awesomeParticlePainter/dataStructure'
 _BasicElement = require './_BasicElement'
 painterRepo = require '../painter/awesomeParticlePainter/repo'
 classic = require 'utila/scripts/js/lib/classic'
@@ -38,9 +37,9 @@ module.exports = classic.mix Api_, class AwesomeParticle extends _BasicElement
 
 	_init: (@_flags, @_index) ->
 
-		@_params = dataStructure.get @_flags
-
 		@_painter = painterRepo.get @_scene, @_flags, @_index
+
+		@_params = @_painter.makeParamHolder()
 
 		return
 
@@ -48,7 +47,7 @@ module.exports = classic.mix Api_, class AwesomeParticle extends _BasicElement
 
 		p = @_painter
 
-		p.paint()
+		p.paint @_params
 
 		return
 

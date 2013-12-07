@@ -1,4 +1,4 @@
-module.exports.makeArray = (obj, type) ->
+module.exports.floatStruct = (obj, type) ->
 
 	size = 0
 
