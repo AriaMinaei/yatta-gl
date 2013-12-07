@@ -4,7 +4,7 @@ painterRepo = require '../painter/awesomeParticlePainter/repo'
 classic = require 'utila/scripts/js/lib/classic'
 Api_ = require './awesomeParticle/Api_'
 
-module.exports = classic.mix Api_, class PointParticle extends _BasicElement
+module.exports = classic.mix Api_, class AwesomeParticle extends _BasicElement
 
 	@create: (sceneOrEl, flags) ->
 

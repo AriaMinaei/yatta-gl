@@ -90,9 +90,9 @@ module.exports = class Scene
 
 		@timing.tick t
 
-		# if @_shouldRedraw
+		if @_shouldRedraw
 
-		# 	@_shouldRedraw = no
+			@_shouldRedraw = no
 
 		do @_redraw
 
