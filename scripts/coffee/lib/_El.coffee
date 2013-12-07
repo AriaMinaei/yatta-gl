@@ -1,16 +1,17 @@
 exposeMethods = require './utility/exposeMethods'
+array = require 'utila/scripts/js/lib/array'
 
 module.exports = class _El
 
 	self = @
 
-	constructor: (scene) ->
+	constructor: (sceneOrEl) ->
 
 		exposeMethods @
 
 		@_children = []
 
-		@putIn scene
+		@putIn sceneOrEl
 
 	putIn: (sceneOrEl) ->
 
@@ -33,6 +34,26 @@ module.exports = class _El
 		do @_respondToParentChange
 
 		@
+
+	quit: ->
+
+		p = @parent
+
+		if p?
+
+			p._notYourChildAnymore @
+
+		for child in @_children
+
+			child.quit()
+
+		return
+
+	_notYourChildAnymore: (el) ->
+
+		array.pluckItem @_children, el
+
+		return
 
 	_adopt: (el) ->
 

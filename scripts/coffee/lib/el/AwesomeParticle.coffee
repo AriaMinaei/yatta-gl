@@ -1,13 +1,48 @@
-AwesomeParticlePainter = require '../painter/AwesomeParticlePainter'
+dataStructure = require '../painter/awesomeParticlePainter/dataStructure'
 _BasicElement = require './_BasicElement'
+painterRepo = require '../painter/awesomeParticlePainter/repo'
+classic = require 'utila/scripts/js/lib/classic'
+Api_ = require './awesomeParticle/Api_'
 
-module.exports = class PointParticle extends _BasicElement
+module.exports = classic.mix Api_, class PointParticle extends _BasicElement
 
-	constructor: (scene, options) ->
+	@create: (sceneOrEl, flags) ->
+
+		index = painterRepo.getIndexForFlags flags
+
+		AwesomeParticlePool.get sceneOrEl, flags, index
+
+	@take: (el) ->
+
+		AwesomeParticlePool.take el
+
+		return
+
+	constructor: (sceneOrEl, flags, index) ->
 
 		super
 
+		@_init flags, index
 
+	quit: ->
+
+		super
+
+		self.take @
+
+		return
+
+	_respondToParentChange: ->
+
+		return
+
+	_init: (@_flags, @_index) ->
+
+		@_params = dataStructure.get @_flags
+
+		@_painter = painterRepo.get @_scene, @_flags, @_index
+
+		return
 
 	_redraw: ->
 
@@ -16,3 +51,6 @@ module.exports = class PointParticle extends _BasicElement
 		p.paint()
 
 		return
+
+AwesomeParticlePool = require './awesomeParticle/AwesomeParticlePool'
+

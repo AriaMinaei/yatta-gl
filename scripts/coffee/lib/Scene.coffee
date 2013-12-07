@@ -16,7 +16,6 @@ module.exports = class Scene
 
 		self._scenes.push @
 
-
 		@_dims =
 
 			# Actual width and height of the canvas
@@ -91,11 +90,11 @@ module.exports = class Scene
 
 		@timing.tick t
 
-		if @_shouldRedraw
+		# if @_shouldRedraw
 
-			@_shouldRedraw = no
+		# 	@_shouldRedraw = no
 
-			do @_redraw
+		do @_redraw
 
 		return
 

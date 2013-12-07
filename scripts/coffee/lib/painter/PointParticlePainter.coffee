@@ -61,7 +61,6 @@ module.exports = class PointParticlePainter extends _Painter
 
 	_reset: ->
 
-
 		@_props.texture = null
 
 		@_props.maskTextureFillChannel = 3
