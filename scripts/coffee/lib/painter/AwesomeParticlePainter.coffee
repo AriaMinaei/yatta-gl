@@ -23,7 +23,7 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			# These will be set in the element api
 			@_baseParams.fillWithImageProps = image: null, updated: no
 
-			# The attributes to the coordinates of the image in the atlas
+			# The attribute to the coordinates of the image in the atlas
 			@_struct.float 'fillWithImageCoords', 4
 
 			# We should enable the atlas
@@ -36,6 +36,20 @@ module.exports = class AwesomeParticlePainter extends _Painter
 		else
 
 			@_struct.unsignedByte 'color', 4, yes
+
+		if flags.maskWithImage
+
+			# These will be set in the element api
+			@_baseParams.maskWithImageProps = image: null, updated: no, channel: 0
+
+			# The attribute to the coordinates of the image in the atlas
+			@_struct.float 'maskWithImageCoords', 4
+
+			# The attribute to specify which color channel should be used for the mask
+			@_struct.float 'maskWithImageChannel', 1
+
+			# We should enable the atlas
+			@_uniforms.atlasSlot = @_program.uniform '1i', 'atlasSlot'
 
 	makeParamHolder: ->
 
@@ -91,8 +105,6 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 	_prepareAtlasTexture: (imageUrl) ->
 
-		console.log imageUrl
-
 		return if @_atlasTexture?
 
 		@_atlasTexture = @_scene._textureRepo.get imageUrl
@@ -105,28 +117,44 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 	paint: (params) ->
 
-		buffer = params.__buffer
-
+		# start by activating the program
 		@_program.activate()
 
-		@_theBuffer.data buffer
+		# fillWithImage
+		if @flags.fillWithImage and params.fillWithImageProps.updated
 
-		if @flags.fillWithImage
+			# get atlas data of the element's image
+			image = @_scene.atlas.getImageData params.fillWithImageProps.image
 
-			# see which atlas it is using
-			if params.fillWithImageProps.updated
+			# prepare the atls texture, if it's not already
+			@_prepareAtlasTexture image.atlasUrl
 
-				params.fillWithImageProps.updated = no
+			# the shader needs to know the coordinates of the image
+			# in the shader atlas
+			params.fillWithImageCoords.set image.coords
 
-				image = @_scene.atlas.getImageData params.fillWithImageProps.image
+			# Let's not redo all this agian
+			params.fillWithImageProps.updated = no
 
-				@_prepareAtlasTexture image.atlasUrl
+		# maskWithImage
+		if @flags.maskWithImage and params.maskWithImageProps.updated
 
-				params.fillWithImageCoords[0] = image.coords[0]
-				params.fillWithImageCoords[1] = image.coords[1]
-				params.fillWithImageCoords[2] = image.coords[2]
-				params.fillWithImageCoords[3] = image.coords[3]
+			# get atlas data of the element's image
+			image = @_scene.atlas.getImageData params.maskWithImageProps.image
 
-		# @_uniforms.color.set 0.5, 0.7, 0.9
+			# prepare the atls texture, if it's not already
+			@_prepareAtlasTexture image.atlasUrl
+
+			# the shader needs to know the coordinates of the image
+			# in the shader atlas
+			params.maskWithImageCoords.set image.coords
+
+			params.maskWithImageChannel[0] = params.maskWithImageProps.channel || 0
+
+			# Let's not redo all this agian
+			params.maskWithImageProps.updated = no
+
+		# all done with attributes, let's send it over
+		@_theBuffer.data params.__buffer
 
 		@_gila.drawPoints 0, 1

@@ -104,3 +104,14 @@ module.exports = class Api_
 		@_params.fillWithImageProps.updated = yes
 
 		@
+
+	maskWithImage: (image, channel) ->
+
+		@_params.maskWithImageProps.image = String image
+
+		@_params.maskWithImageProps.channel = parseInt(channel) || 0
+
+		@_params.maskWithImageProps.updated = yes
+
+		@
+

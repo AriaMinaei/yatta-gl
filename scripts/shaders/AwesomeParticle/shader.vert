@@ -2,6 +2,7 @@ attribute vec3 pos;
 
 attribute lowp float size;
 
+
 #ifdef FILLWITHIMAGE
 
 	attribute vec4 fillWithImageCoords;
@@ -16,6 +17,18 @@ attribute lowp float size;
 
 #endif
 
+#ifdef MASKWITHIMAGE
+
+	attribute vec4 maskWithImageCoords;
+
+	varying vec4 vMaskWithImageCoords;
+
+	attribute float maskWithImageChannel;
+
+	varying float vMaskWithImageChannel;
+
+#endif
+
 void main(void) {
 
 	#ifdef FILLWITHIMAGE
@@ -25,6 +38,14 @@ void main(void) {
 	#else
 
 		vColor = color;
+
+	#endif
+
+	#ifdef MASKWITHIMAGE
+
+		vMaskWithImageCoords = maskWithImageCoords;
+
+		vMaskWithImageChannel = maskWithImageChannel;
 
 	#endif
 
