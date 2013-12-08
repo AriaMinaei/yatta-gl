@@ -1,29 +1,9 @@
-module.exports.vert = """
+##
 
-attribute vec3 pos;
+macro read (node) ->
 
-attribute lowp float size;
+	macro.valToNode String macro.require('fs').readFileSync macro.nodeToVal node
 
-attribute lowp vec4 color;
+module.exports.frag = read 'shaders/AwesomeParticle/shader.frag'
 
-varying vec4 vColor;
-
-void main(void) {
-
-	vColor = color;
-
-	gl_Position = vec4(pos, 1);
-
-	gl_PointSize = float(size);
-}
-"""
-
-module.exports.frag = """
-precision mediump float;
-
-varying vec4 vColor;
-
-void main() {
-	gl_FragColor = vColor;
-}
-"""
+module.exports.vert = read 'shaders/AwesomeParticle/shader.vert'

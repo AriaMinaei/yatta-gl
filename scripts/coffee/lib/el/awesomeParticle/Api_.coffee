@@ -96,3 +96,11 @@ module.exports = class Api_
 	getColor: ->
 
 		@_params.color
+
+	fillWithImage: (image) ->
+
+		@_params.fillWithImageProps.image = String image
+
+		@_params.fillWithImageProps.updated = yes
+
+		@

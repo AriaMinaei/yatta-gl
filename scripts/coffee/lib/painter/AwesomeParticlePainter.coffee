@@ -8,6 +8,8 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 	_setupDataStructure: ->
 
+		@_baseParams = {}
+
 		flags = @flags
 
 		@_struct = new FloatStruct
@@ -16,11 +18,16 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 		@_struct.float 'pos', 3
 
-		# @_struct.float 'zRotation', 1
+		if flags.fillWithImage
 
-		if flags.fillImage
+			# These will be set in the element api
+			@_baseParams.fillWithImageProps = image: null, updated: no
 
-			throw Error "fillImage not implemented yet"
+			# The attributes to the coordinates of the image in the atlas
+			@_struct.float 'fillWithImageCoords', 4
+
+			# We should enable the atlas
+			@_uniforms.atlasSlot = @_program.uniform '1i', 'atlasSlot'
 
 		else if flags.maskOnImage
 
@@ -32,32 +39,37 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 	makeParamHolder: ->
 
-		do @_struct.makeParamHolder
+		@_struct.makeParamHolder @_baseParams
 
 	_init: (scene, @flags, @index) ->
 
-		do @_setupDataStructure
-
 		@_program = do @_getProgram
 
-		# @_uniforms =
+		@_uniforms = {}
 
-			# color: @_program.uniform '3f', 'color'
+		@_atlasTexture = null
+
+		do @_setupDataStructure
 
 		@_theBuffer = @_gila.makeArrayBuffer()
 
 		do @_setupAttribs
 
-
 	_getProgram: ->
+
+		flagsInCaps = {}
+
+		for key, val of @flags
+
+			flagsInCaps[key.toUpperCase()] = val
 
 		vert = @_gila.getVertexShader 'awesome-particle-shader-vert',
 
-			shaders.vert, @flags
+			shaders.vert, flagsInCaps
 
 		frag = @_gila.getFragmentShader 'awesome-particle-shader-frag',
 
-			shaders.frag, @flags
+			shaders.frag, flagsInCaps
 
 		@_gila.getProgram vert, frag
 
@@ -77,6 +89,20 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 		return
 
+	_prepareAtlasTexture: (imageUrl) ->
+
+		console.log imageUrl
+
+		return if @_atlasTexture?
+
+		@_atlasTexture = @_scene._textureRepo.get imageUrl
+
+		@_uniforms.atlasSlot.set 0
+
+		@_atlasTexture.assignToSlot 0
+
+		return
+
 	paint: (params) ->
 
 		buffer = params.__buffer
@@ -84,6 +110,22 @@ module.exports = class AwesomeParticlePainter extends _Painter
 		@_program.activate()
 
 		@_theBuffer.data buffer
+
+		if @flags.fillWithImage
+
+			# see which atlas it is using
+			if params.fillWithImageProps.updated
+
+				params.fillWithImageProps.updated = no
+
+				image = @_scene.atlas.getImageData params.fillWithImageProps.image
+
+				@_prepareAtlasTexture image.atlasUrl
+
+				params.fillWithImageCoords[0] = image.coords[0]
+				params.fillWithImageCoords[1] = image.coords[1]
+				params.fillWithImageCoords[2] = image.coords[2]
+				params.fillWithImageCoords[3] = image.coords[3]
 
 		# @_uniforms.color.set 0.5, 0.7, 0.9
 

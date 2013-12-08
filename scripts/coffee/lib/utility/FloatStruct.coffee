@@ -1,3 +1,5 @@
+object = require 'utila/scripts/js/lib/object'
+
 module.exports = class FloatStruct
 
 	constructor: ->
@@ -130,11 +132,11 @@ module.exports = class FloatStruct
 
 		@_stride = offset
 
-	makeParamHolder: ->
+	makeParamHolder: (base) ->
 
 		do @_prepare
 
-		params = {}
+		params = if base? then object.clone base else {}
 
 		params.__buffer = buffer = new ArrayBuffer @_stride
 
