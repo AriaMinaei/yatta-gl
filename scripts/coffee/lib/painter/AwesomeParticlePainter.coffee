@@ -59,7 +59,12 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 		@_program = do @_getProgram
 
-		@_uniforms = {}
+		@_program.activate()
+
+		@_uniforms =
+
+			win: @_program.uniform('2f', 'win')
+			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
 
 		@_atlasTexture = null
 

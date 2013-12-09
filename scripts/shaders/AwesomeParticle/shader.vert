@@ -2,6 +2,7 @@ attribute vec3 pos;
 
 attribute lowp float size;
 
+uniform vec2 win;
 
 #ifdef FILLWITHIMAGE
 
@@ -49,7 +50,9 @@ void main(void) {
 
 	#endif
 
-	gl_Position = vec4(pos, 1);
+	vec3 finalPosition = vec3(pos.xy / win.xy, pos.z);
+
+	gl_Position = vec4(finalPosition, 1);
 
 	gl_PointSize = float(size);
 }

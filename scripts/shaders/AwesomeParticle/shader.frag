@@ -1,5 +1,7 @@
 precision mediump float;
 
+uniform vec2 window;
+
 #ifdef FILLWITHIMAGE
 
 	varying vec4 vFillWithImageCoords;
@@ -75,7 +77,7 @@ void main() {
 
 	#endif
 
-
-
 	gl_FragColor = vec4(fillColor.xyz, fillColor[3] * opacity);
+	// gl_FragColor = vec4(fillColor.rgb, 1.0);
+
 }
