@@ -132,7 +132,7 @@ module.exports = class AwesomeParticlePainter extends _Painter
 		return if @_pictureAtlasTexture?
 
 		@_pictureAtlasTexture = @_scene._textureRepo.get imageUrl
-		@_pictureAtlasTexture.flipY()
+		# @_pictureAtlasTexture.flipY()
 
 		@_uniforms.pictureAtlasSlot.set 1
 
@@ -191,6 +191,8 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			# the shader needs to know the coordinates of the image
 			# in the shader atlas
 			params.maskOnImageCoords.set image.coords
+
+			# params.maskOnImageCoords[2] = 0.7
 
 			# Let's not redo all this agian
 			params.maskOnImageProps.updated = no
