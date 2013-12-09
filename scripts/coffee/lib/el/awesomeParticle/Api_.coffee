@@ -105,6 +105,14 @@ module.exports = class Api_
 
 		@
 
+	maskOnImage: (image) ->
+
+		@_params.maskOnImageProps.image = String image
+
+		@_params.maskOnImageProps.updated = yes
+
+		@
+
 	maskWithImage: (image, channel) ->
 
 		@_params.maskWithImageProps.image = String image

@@ -1,10 +1,16 @@
 precision mediump float;
 
-uniform vec2 window;
+uniform vec2 win;
 
-#ifdef FILLWITHIMAGE
+#if defined(FILLWITHIMAGE)
 
 	varying vec4 vFillWithImageCoords;
+
+#elif defined(MASKONIMAGE)
+
+	varying vec4 vMaskOnImageCoords;
+
+	uniform sampler2D pictureAtlasSlot;
 
 #else
 
@@ -12,7 +18,7 @@ uniform vec2 window;
 
 #endif
 
-#ifdef MASKWITHIMAGE
+#if defined(MASKWITHIMAGE)
 
 
 	varying vec4 vMaskWithImageCoords;
@@ -24,7 +30,7 @@ uniform vec2 window;
 
 #if defined(FILLWITHIMAGE) || defined(MASKWITHIMAGE)
 
-	uniform sampler2D atlasSlot;
+	uniform sampler2D imageAtlasSlot;
 
 #endif
 
@@ -32,15 +38,31 @@ void main() {
 
 	vec2 pointCoord = gl_PointCoord;
 
+	vec2 clipCoord = vec2(gl_FragCoord.x / win.x - 1.0, gl_FragCoord.y / win.y - 1.0);
+
 	#ifdef FILLWITHIMAGE
 
 		vec4 fillColor = texture2D(
 
-			atlasSlot,
+			imageAtlasSlot,
 
 			vec2(
 				vFillWithImageCoords[2] * pointCoord.x + vFillWithImageCoords[0],
 				vFillWithImageCoords[3] * pointCoord.y + vFillWithImageCoords[1]
+				)
+			);
+
+	#elif defined(MASKONIMAGE)
+
+
+
+		vec4 fillColor = texture2D(
+
+			pictureAtlasSlot,
+
+			vec2(
+				vMaskOnImageCoords[2] * clipCoord.x + vMaskOnImageCoords[0],
+				vMaskOnImageCoords[3] * clipCoord.y + vMaskOnImageCoords[1]
 				)
 			);
 
@@ -58,7 +80,7 @@ void main() {
 		// let's sample all the colors first
 		vec4 _mask = texture2D(
 
-			atlasSlot,
+			imageAtlasSlot,
 
 			vec2(
 				vMaskWithImageCoords[2] * pointCoord.x + vMaskWithImageCoords[0],
@@ -77,7 +99,7 @@ void main() {
 
 	#endif
 
-	gl_FragColor = vec4(fillColor.xyz, fillColor[3] * opacity);
+	gl_FragColor = vec4(fillColor.rgb, fillColor[3] * opacity);
 	// gl_FragColor = vec4(fillColor.rgb, 1.0);
 
 }

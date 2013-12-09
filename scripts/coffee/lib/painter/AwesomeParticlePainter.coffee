@@ -27,11 +27,18 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			@_struct.float 'fillWithImageCoords', 4
 
 			# We should enable the atlas
-			@_uniforms.atlasSlot = @_program.uniform '1i', 'atlasSlot'
+			@_uniforms.imageAtlasSlot = @_program.uniform '1i', 'imageAtlasSlot'
 
 		else if flags.maskOnImage
 
-			throw Error "maskOnImage not implemented yet"
+			# These will be set in the element api
+			@_baseParams.maskOnImageProps = image: null, updated: no
+
+			# The attribute to the coordinates of the image in the atlas
+			@_struct.float 'maskOnImageCoords', 4
+
+			# We should enable the atlas
+			@_uniforms.pictureAtlasSlot = @_program.uniform '1i', 'pictureAtlasSlot'
 
 		else
 
@@ -49,7 +56,7 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			@_struct.float 'maskWithImageChannel', 1
 
 			# We should enable the atlas
-			@_uniforms.atlasSlot = @_program.uniform '1i', 'atlasSlot'
+			@_uniforms.imageAtlasSlot = @_program.uniform '1i', 'imageAtlasSlot'
 
 	makeParamHolder: ->
 
@@ -66,7 +73,7 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			win: @_program.uniform('2f', 'win')
 			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
 
-		@_atlasTexture = null
+		@_imageAtlasTexture = null
 
 		do @_setupDataStructure
 
@@ -108,15 +115,28 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 		return
 
-	_prepareAtlasTexture: (imageUrl) ->
+	_prepareImageAtlasTexture: (imageUrl) ->
 
-		return if @_atlasTexture?
+		return if @_imageAtlasTexture?
 
-		@_atlasTexture = @_scene._textureRepo.get imageUrl
+		@_imageAtlasTexture = @_scene._textureRepo.get imageUrl
 
-		@_uniforms.atlasSlot.set 0
+		@_uniforms.imageAtlasSlot.set 0
 
-		@_atlasTexture.assignToSlot 0
+		@_imageAtlasTexture.assignToSlot 0
+
+		return
+
+	_preparePictureAtlasTexture: (imageUrl) ->
+
+		return if @_pictureAtlasTexture?
+
+		@_pictureAtlasTexture = @_scene._textureRepo.get imageUrl
+		@_pictureAtlasTexture.flipY()
+
+		@_uniforms.pictureAtlasSlot.set 1
+
+		@_pictureAtlasTexture.assignToSlot 1
 
 		return
 
@@ -132,7 +152,7 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			image = @_scene.atlas.getImageData params.fillWithImageProps.image
 
 			# prepare the atls texture, if it's not already
-			@_prepareAtlasTexture image.atlasUrl
+			@_prepareImageAtlasTexture image.atlasUrl
 
 			# the shader needs to know the coordinates of the image
 			# in the shader atlas
@@ -148,7 +168,7 @@ module.exports = class AwesomeParticlePainter extends _Painter
 			image = @_scene.atlas.getImageData params.maskWithImageProps.image
 
 			# prepare the atls texture, if it's not already
-			@_prepareAtlasTexture image.atlasUrl
+			@_prepareImageAtlasTexture image.atlasUrl
 
 			# the shader needs to know the coordinates of the image
 			# in the shader atlas
@@ -158,6 +178,22 @@ module.exports = class AwesomeParticlePainter extends _Painter
 
 			# Let's not redo all this agian
 			params.maskWithImageProps.updated = no
+
+		# maskWithImage
+		if @flags.maskOnImage and params.maskOnImageProps.updated
+
+			# get atlas data of the element's image
+			image = @_scene.atlas.getImageData params.maskOnImageProps.image
+
+			# prepare the atls texture, if it's not already
+			@_preparePictureAtlasTexture image.atlasUrl
+
+			# the shader needs to know the coordinates of the image
+			# in the shader atlas
+			params.maskOnImageCoords.set image.coords
+
+			# Let's not redo all this agian
+			params.maskOnImageProps.updated = no
 
 		# all done with attributes, let's send it over
 		@_theBuffer.data params.__buffer
