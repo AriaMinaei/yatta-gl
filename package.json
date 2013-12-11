@@ -5,14 +5,18 @@
   "main": "scripts/js/lib/YattaGL.js",
   "dependencies": {
     "gl-matrix": "~2.0.0",
-    "utila": "~0.3.0-beta1"
+    "utila": "*",
+    "gila": "*",
+    "arguman": "*",
+    "raf-timing": "*",
+    "transformation": "*"
+
   },
   "devDependencies": {
-    "coffee-script": "~1.6.3"
+
   },
   "scripts": {
-    "test": "node ./node_modules/coffee-script/bin/cake test",
-    "prepublish": "node ./node_modules/coffee-script/bin/cake build"
+
   },
   "author": "Aria Minaei",
   "license": "MIT",
