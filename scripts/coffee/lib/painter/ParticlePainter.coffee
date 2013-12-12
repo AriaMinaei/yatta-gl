@@ -18,6 +18,8 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_struct.float 'pos', 3
 
+		@_struct.float 'opacity', 1
+
 		if flags.fillWithImage
 
 			# These will be set in the element api

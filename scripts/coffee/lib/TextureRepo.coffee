@@ -7,6 +7,8 @@ module.exports = class TextureRepo
 		t
 		.magnifyWithLinear()
 		.minifyWithLinearMipmapLinear()
+		.wrapSClampToEdge()
+		.wrapTClampToEdge()
 
 		return
 

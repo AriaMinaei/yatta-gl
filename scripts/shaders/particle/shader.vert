@@ -1,8 +1,12 @@
-precision mediump float;
+precision highp float;
 
 attribute vec3 pos;
 
-attribute lowp float size;
+attribute float size;
+
+attribute float opacity;
+
+varying float vOpacity;
 
 // Dimensions of the canvas (perceived dimensions), divided in 2.
 // We'll use this to convert clip-space coords to window-space coords
@@ -25,7 +29,7 @@ uniform vec2 win;
 #else
 
 	// A regular color vector
-	attribute lowp vec4 color;
+	attribute vec4 color;
 
 	// we'll pas this color to the fragment shader
 	varying vec4 vColor;
@@ -51,6 +55,8 @@ uniform vec2 win;
 #endif
 
 void main(void) {
+
+	vOpacity = opacity;
 
 	#if defined(FILLWITHIMAGE)
 

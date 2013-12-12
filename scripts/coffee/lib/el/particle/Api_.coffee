@@ -97,6 +97,16 @@ module.exports = class Api_
 
 		@_params.color
 
+	opacity: (o) ->
+
+		@_params.opacity[0] = o
+
+		@
+
+	getOpacity: ->
+
+		@_params.opacity[0]
+
 	fillWithImage: (image) ->
 
 		@_params.fillWithImageProps.image = String image

@@ -1,6 +1,8 @@
-precision mediump float;
+precision highp float;
 
 uniform vec2 win;
+
+varying float vOpacity;
 
 #if defined(FILLWITHIMAGE)
 
@@ -77,7 +79,7 @@ void main() {
 
 	#endif
 
-	float opacity = 1.0;
+	float opacityMult = 1.0;
 
 	// masking with an image
 	#ifdef MASKWITHIMAGE
@@ -95,16 +97,16 @@ void main() {
 
 		// now choose a channel
 		if (vMaskWithImageChannel == 0.0) {
-			opacity = _mask[0];
+			opacityMult = _mask[0];
 		} else if (vMaskWithImageChannel == 1.0) {
-			opacity = _mask[1];
+			opacityMult = _mask[1];
 		} else if (vMaskWithImageChannel == 2.0) {
-			opacity = _mask[2];
+			opacityMult = _mask[2];
 		}
 
 	#endif
 
-	gl_FragColor = vec4(fillColor.rgb, fillColor[3] * opacity);
+	gl_FragColor = vec4(fillColor.rgb, fillColor[3] * opacityMult * vOpacity);
 	// gl_FragColor = vec4(fillColor.rgb, 1.0);
 
 }
