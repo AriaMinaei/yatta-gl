@@ -20,6 +20,8 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_struct.float 'opacity', 1
 
+		@_baseParams.blending = 0
+
 		if flags.fillWithImage
 
 			# These will be set in the element api
@@ -65,6 +67,8 @@ module.exports = class ParticlePainter extends _Painter
 		@_struct.makeParamHolder @_baseParams
 
 	_init: (scene, @flags, @index) ->
+
+		@_currentBlending = -1
 
 		@_program = do @_getProgram
 
@@ -142,6 +146,38 @@ module.exports = class ParticlePainter extends _Painter
 
 		return
 
+	_applyBlending: (newBlending) ->
+
+		return if @_currentBlending is newBlending
+
+		@_currentBlending = newBlending
+
+		if newBlending is 0
+
+			@_gila.blending.disable()
+
+			return
+
+		@_gila.blending.enable()
+
+		switch newBlending
+
+			when 1
+
+				@_gila.blend
+				.src.srcAlpha()
+				.dst.oneMinusSrcAlpha()
+				.update()
+
+			when 2
+
+				@_gila.blend
+				.src.srcAlpha()
+				.dst.one()
+				.update()
+
+		return
+
 	paint: (params) ->
 
 		# start by activating the program
@@ -201,5 +237,7 @@ module.exports = class ParticlePainter extends _Painter
 
 		# all done with attributes, let's send it over
 		@_theBuffer.data params.__buffer
+
+		@_applyBlending params.blending
 
 		@_gila.drawPoints 0, 1

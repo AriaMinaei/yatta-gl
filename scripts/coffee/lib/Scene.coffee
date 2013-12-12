@@ -160,13 +160,6 @@ module.exports = class Scene
 
 		do @_applyClearColor
 
-		@_gila.blending.enable()
-
-		@_gila.blend
-		.src.srcAlpha()
-		.dst.one()
-		.update()
-
 		return
 
 	bg: (r, g, b, a = 1) ->

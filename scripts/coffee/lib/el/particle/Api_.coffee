@@ -133,3 +133,20 @@ module.exports = class Api_
 
 		@
 
+	noBlend: ->
+
+		@_params.blending = 0
+
+		@
+
+	blendAsTransparent: ->
+
+		@_params.blending = 1
+
+		@
+
+	blendAsAdd: ->
+
+		@_params.blending = 2
+
+		@
