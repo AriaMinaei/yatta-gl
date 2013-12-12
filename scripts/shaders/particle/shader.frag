@@ -4,6 +4,12 @@ uniform vec2 win;
 
 varying float vOpacity;
 
+#ifdef TINT
+
+varying vec4 vTint;
+
+#endif
+
 #if defined(FILLWITHIMAGE)
 
 	varying vec4 vFillWithImageCoords;
@@ -103,6 +109,12 @@ void main() {
 		} else if (vMaskWithImageChannel == 2.0) {
 			opacityMult = _mask[2];
 		}
+
+	#endif
+
+	#ifdef TINT
+
+		fillColor.rgb = mix(fillColor.rgb, vTint.rgb, vTint[3]);
 
 	#endif
 

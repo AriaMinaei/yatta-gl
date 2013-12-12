@@ -150,3 +150,12 @@ module.exports = class Api_
 		@_params.blending = 2
 
 		@
+
+	tint: (r, g, b, intensity) ->
+
+		@_params.tint[0] = r
+		@_params.tint[1] = g
+		@_params.tint[2] = b
+		@_params.tint[3] = intensity
+
+		@

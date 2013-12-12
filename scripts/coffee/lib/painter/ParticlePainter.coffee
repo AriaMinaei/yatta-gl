@@ -22,6 +22,10 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_baseParams.blending = 0
 
+		if flags.tint
+
+			@_struct.float 'tint', 4
+
 		if flags.fillWithImage
 
 			# These will be set in the element api

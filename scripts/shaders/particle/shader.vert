@@ -36,6 +36,14 @@ uniform vec2 win;
 
 #endif
 
+#ifdef TINT
+
+attribute vec4 tint;
+
+varying vec4 vTint;
+
+#endif
+
 // We can mask the final color with another image
 #ifdef MASKWITHIMAGE
 
@@ -55,6 +63,12 @@ uniform vec2 win;
 #endif
 
 void main(void) {
+
+	#ifdef TINT
+
+		vTint = tint;
+
+	#endif
 
 	vOpacity = opacity;
 
