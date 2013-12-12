@@ -1,4 +1,4 @@
-module.exports = class AwesomeParticlePool
+module.exports = class ParticlePool
 
 	self = @
 
@@ -42,7 +42,7 @@ module.exports = class AwesomeParticlePool
 
 		else
 
-			return new AwesomeParticle el, @flags, @index
+			return new Particle el, @flags, @index
 
 	take: (el) ->
 
@@ -52,4 +52,4 @@ module.exports = class AwesomeParticlePool
 
 		return
 
-AwesomeParticle = require '../AwesomeParticle'
+Particle = require '../Particle'

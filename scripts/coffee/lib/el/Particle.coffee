@@ -1,83 +1,55 @@
-ParticlePainter = require '../painter/ParticlePainter'
-_BasicElement = require './_BasicElement'
-Dims2D = require './property/Dims2D'
+_El = require '../_El'
+painterRepo = require '../painter/particlePainter/repo'
+classic = require 'utila/scripts/js/lib/classic'
+Api_ = require './particle/Api_'
 
-[RED, GREEN, BLUE, ALL] = [0, 1, 2, 3]
+module.exports = classic.mix Api_, class Particle extends _El
 
-module.exports = class Particle extends _BasicElement
+	@create: (sceneOrEl, flags) ->
 
-	constructor: (scene, textureSource, textureChannel) ->
+		index = painterRepo.getIndexForFlags flags
+
+		ParticlePool.get sceneOrEl, flags, index
+
+	@take: (el) ->
+
+		ParticlePool.take el
+
+		return
+
+	constructor: (sceneOrEl, flags, index) ->
 
 		super
 
-		@_dims = new Dims2D
+		@_init flags, index
 
-		@_painter = null
+	quit: ->
 
-		@_texture =
+		super
 
-			object: null
+		self.take @
 
-			channel: null
-
-			source: null
-
-		@setTexture textureSource, textureChannel
-
-	setTexture: (source, channel = ALL) ->
-
-		unless source?
-
-			throw Error "`texture source` must be a valid image/url"
-
-		@_texture.source = source
-
-		if @_gila.debug and channel not in [ALL, RED, GREEN, BLUE]
-
-			throw Error "`channel` must be an integer either 0(red), 1(green), 2(blue), 3(all)"
-
-		@_texture.channel = channel
-
-		@_texture.object = @_scene._textureRepo.get @_texture.source
-
-		@
-
-	_getPainter: ->
-
-		unless @_painter?
-
-			@_painter = new ParticlePainter @
-
-		@_painter
+		return
 
 	_respondToParentChange: ->
 
-		do @_resetProgram
-
 		return
 
-	_resetProgram: ->
+	_init: (@_flags, @_index) ->
 
-		@_painter = null
+		@_painter = painterRepo.get @_scene, @_flags, @_index
 
-		do @_getPainter
+		@_params = @_painter.makeParamHolder()
+
+		return
 
 	_redraw: ->
 
-		p = @_getPainter()
+		p = @_painter
 
-		p.setDims @_dims.getDims()
-
-		p.setTransformation @_transformation.getMatrix()
-
-		p.setPerspective @_getCameraPerspective()
-
-		p.setTexture @_texture.object, @_texture.channel
-
-		p.paint()
-
-		do @_redrawChildren
+		p.paint @_params
 
 		return
 
-	@_methodsToExpose: [Dims2D._methodsToExpose]
+ParticlePool = require './particle/ParticlePool'
+

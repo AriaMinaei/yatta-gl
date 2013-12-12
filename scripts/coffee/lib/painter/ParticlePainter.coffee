@@ -1,173 +1,203 @@
+FloatStruct = require '../utility/FloatStruct'
 _Painter = require '../_Painter'
-
-{vert, frag} = require './particlePainter/shaders'
+shaders = require './ParticlePainter/shaders'
 
 module.exports = class ParticlePainter extends _Painter
 
 	self = @
 
-	# Here, programs aren't limited to webgl programs, and come
-	# with predefined shapes and geometries, among other things.
-	@_vertices: new Float32Array [
-		-1, -1, 0,
-		-1,  1, 0,
-		 1, -1, 0,
+	_setupDataStructure: ->
 
-		 1, -1, 0,
-		-1,  1, 0,
-		 1,  1, 0
-	]
+		@_baseParams = {}
 
-	_init: ->
+		flags = @flags
 
-		@_program = @_gila.makeProgram vert, frag, 'particleProgram'
+		@_struct = new FloatStruct
+
+		@_struct.float 'size', 1
+
+		@_struct.float 'pos', 3
+
+		if flags.fillWithImage
+
+			# These will be set in the element api
+			@_baseParams.fillWithImageProps = image: null, updated: no
+
+			# The attribute to the coordinates of the image in the atlas
+			@_struct.float 'fillWithImageCoords', 4
+
+			# We should enable the atlas
+			@_uniforms.imageAtlasSlot = @_program.uniform '1i', 'imageAtlasSlot'
+
+		else if flags.maskOnImage
+
+			# These will be set in the element api
+			@_baseParams.maskOnImageProps = image: null, updated: no
+
+			# The attribute to the coordinates of the image in the atlas
+			@_struct.float 'maskOnImageCoords', 4
+
+			# We should enable the atlas
+			@_uniforms.pictureAtlasSlot = @_program.uniform '1i', 'pictureAtlasSlot'
+
+		else
+
+			@_struct.unsignedByte 'color', 4, yes
+
+		if flags.maskWithImage
+
+			# These will be set in the element api
+			@_baseParams.maskWithImageProps = image: null, updated: no, channel: 0
+
+			# The attribute to the coordinates of the image in the atlas
+			@_struct.float 'maskWithImageCoords', 4
+
+			# The attribute to specify which color channel should be used for the mask
+			@_struct.float 'maskWithImageChannel', 1
+
+			# We should enable the atlas
+			@_uniforms.imageAtlasSlot = @_program.uniform '1i', 'imageAtlasSlot'
+
+	makeParamHolder: ->
+
+		@_struct.makeParamHolder @_baseParams
+
+	_init: (scene, @flags, @index) ->
+
+		@_program = do @_getProgram
 
 		@_program.activate()
-
-		@_props =
-
-			dims: new Float32Array 2
-
-			transformation: null
-
-			perspective: null
-
-			shouldUpdatePerspective: yes
-
-			lastPerspectiveUploadTime: -1
-
-			texture: null
-
-			textureFillChannel: 0
-
-		@_vx =
-
-			attr: @_program.attr 'vx'
-
-			buffer: @_gila.makeArrayBuffer()
-
-		@_vx.attr.enable()
-
-		@_vx.buffer.data self._vertices
 
 		@_uniforms =
 
-			dims: @_program.uniform '2f', 'uDims'
+			win: @_program.uniform('2f', 'win')
+			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
 
-			trans: @_program.uniform 'mat4', 'uTrans'
+		@_imageAtlasTexture = null
 
-			pers: @_program.uniform 'mat4', 'uPers'
+		do @_setupDataStructure
 
-			textureSlot: @_program.uniform '1i', 'textureSlot'
+		@_theBuffer = @_gila.makeArrayBuffer()
 
-			textureFillChannel: @_program.uniform '1i', 'textureFillChannel'
+		do @_setupAttribs
 
-	setDims: (dimsArray) ->
+	_getProgram: ->
 
-		@_props.dims = dimsArray
+		flagsInCaps = {}
 
-		@
+		for key, val of @flags
 
-	setTransformation: (t) ->
+			flagsInCaps[key.toUpperCase()] = val
 
-		@_props.transformation = t
+		vert = @_gila.getVertexShader 'particle-shader-vert',
 
-		@
+			shaders.vert, flagsInCaps
 
-	setPerspective: (p) ->
+		frag = @_gila.getFragmentShader 'particle-shader-frag',
 
-		# if p is @_props.perspective
+			shaders.frag, flagsInCaps
 
-		# 	if not p.lastUpdateTime? or p.lastUpdateTime > @_props.lastPerspectiveUploadTime
+		@_gila.getProgram vert, frag
 
-		# 		@_props.shouldUpdatePerspective = yes
-
-		# 	return @
-
-		@_props.perspective = p
-
-		@_props.shouldUpdatePerspective = yes
-
-		@
-
-	setTexture: (texture, channel) ->
-
-		@_props.texture = texture
-
-		@_props.textureFillChannel = channel
-
-		@
-
-	_reset: ->
-
-		@setDims 0, 0
-
-		@setTransformation null
-
-		@_props.texture = null
-
-		@_props.textureFillChannel = 3
-
-		return
-
-	_activate: ->
+	_setupAttribs: ->
 
 		@_program.activate()
 
-		return
+		@_theBuffer.bind()
 
-	_setPerspectiveUniform: ->
+		stride = @_struct.getStride()
 
-		if @_props.shouldUpdatePerspective
+		for el in @_struct.getElements()
 
-			@_props.lastPerspectiveUploadTime = @_getTickNumber()
+			@_program.attr(el.name).enable()._pointer el.size,
 
-			@_uniforms.pers.set @_props.perspective
-
-		@_props.shouldUpdatePerspective = no
+				el.glType, el.normalized, stride, el.offset
 
 		return
 
-	_setTextureUniforms: ->
+	_prepareImageAtlasTexture: (imageUrl) ->
 
-		@_props.texture.assignToSlot 0
+		return if @_imageAtlasTexture?
 
-		@_uniforms.textureSlot.set 0
+		@_imageAtlasTexture = @_scene._textureRepo.get imageUrl
 
-		@_uniforms.textureFillChannel.set @_props.textureFillChannel
+		@_uniforms.imageAtlasSlot.set 0
 
-		return
-
-	_setUniforms: ->
-
-		@_uniforms.dims.fromArray @_props.dims
-
-		@_uniforms.trans.set @_props.transformation
-
-		do @_setPerspectiveUniform
-
-		do @_setTextureUniforms
+		@_imageAtlasTexture.assignToSlot 0
 
 		return
 
-	_drawVertices: ->
+	_preparePictureAtlasTexture: (imageUrl) ->
 
-		@_vx.buffer.bind()
+		return if @_pictureAtlasTexture?
 
-		@_vx.attr.readAsFloat 3, no, 0, 0
+		@_pictureAtlasTexture = @_scene._textureRepo.get imageUrl
+		# @_pictureAtlasTexture.flipY()
 
-		@_gila.drawTriangles 0, 6
+		@_uniforms.pictureAtlasSlot.set 1
+
+		@_pictureAtlasTexture.assignToSlot 1
 
 		return
 
-	paint: ->
+	paint: (params) ->
 
-		do @_activate
+		# start by activating the program
+		@_program.activate()
 
-		do @_setUniforms
+		# fillWithImage
+		if @flags.fillWithImage and params.fillWithImageProps.updated
 
-		do @_drawVertices
+			# get atlas data of the element's image
+			image = @_scene.atlas.getImageData params.fillWithImageProps.image
 
-		do @_reset
+			# prepare the atls texture, if it's not already
+			@_prepareImageAtlasTexture image.atlasUrl
 
-		@
+			# the shader needs to know the coordinates of the image
+			# in the shader atlas
+			params.fillWithImageCoords.set image.coords
+
+			# Let's not redo all this agian
+			params.fillWithImageProps.updated = no
+
+		# maskWithImage
+		if @flags.maskWithImage and params.maskWithImageProps.updated
+
+			# get atlas data of the element's image
+			image = @_scene.atlas.getImageData params.maskWithImageProps.image
+
+			# prepare the atls texture, if it's not already
+			@_prepareImageAtlasTexture image.atlasUrl
+
+			# the shader needs to know the coordinates of the image
+			# in the shader atlas
+			params.maskWithImageCoords.set image.coords
+
+			params.maskWithImageChannel[0] = params.maskWithImageProps.channel || 0
+
+			# Let's not redo all this agian
+			params.maskWithImageProps.updated = no
+
+		# maskWithImage
+		if @flags.maskOnImage and params.maskOnImageProps.updated
+
+			# get atlas data of the element's image
+			image = @_scene.atlas.getImageData params.maskOnImageProps.image
+
+			# prepare the atls texture, if it's not already
+			@_preparePictureAtlasTexture image.atlasUrl
+
+			# the shader needs to know the coordinates of the image
+			# in the shader atlas
+			params.maskOnImageCoords.set image.coords
+
+			# params.maskOnImageCoords[2] = 0.7
+
+			# Let's not redo all this agian
+			params.maskOnImageProps.updated = no
+
+		# all done with attributes, let's send it over
+		@_theBuffer.data params.__buffer
+
+		@_gila.drawPoints 0, 1

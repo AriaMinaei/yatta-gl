@@ -1,41 +1,9 @@
-module.exports.vert = """
-attribute vec3 vx;
+#133333333333333333333333333333333333333333
 
-uniform vec2 uDims;
+macro read (node) ->
 
-uniform mat4 uTrans;
+	macro.valToNode String macro.require('fs').readFileSync macro.nodeToVal node
 
-uniform mat4 uPers;
+module.exports.frag = read 'shaders/particle/shader.frag'
 
-varying vec2 vTextureCoord;
-
-void main(void) {
-	gl_Position = uPers * uTrans * (vec4(vx, 1) * vec4(uDims, 1, 1)); // * vec4(0.5, 1, 1, 1);
-
-	vTextureCoord = (vx.xy + vec2(1)) / vec2(2);
-}
-"""
-
-module.exports.frag = """
-precision mediump float;
-
-varying vec2 vTextureCoord;
-
-uniform sampler2D textureSlot;
-
-uniform int textureFillChannel;
-
-void main() {
-
-	if (textureFillChannel == 0) {
-		gl_FragColor = vec4(texture2D(textureSlot, vTextureCoord).r);
-	} else if (textureFillChannel == 1) {
-		gl_FragColor = vec4(texture2D(textureSlot, vTextureCoord).g);
-	} else if (textureFillChannel == 2) {
-		gl_FragColor = vec4(texture2D(textureSlot, vTextureCoord).b);
-	} else {
-		gl_FragColor = texture2D(textureSlot, vTextureCoord);
-	}
-
-}
-"""
+module.exports.vert = read 'shaders/particle/shader.vert'

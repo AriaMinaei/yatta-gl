@@ -1,2 +1,2 @@
 module.exports.Scene = require './Scene'
-module.exports.AwesomeParticle = require './el/AwesomeParticle'
+module.exports.Particle = require './el/Particle'

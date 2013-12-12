@@ -12,7 +12,7 @@ module.exports.get = get = (scene, flags, index) ->
 
 	unless painter?
 
-		return repo[index] = new AwesomeParticlePainter scene, flags, index
+		return repo[index] = new ParticlePainter scene, flags, index
 
 	painter
 
@@ -20,4 +20,4 @@ module.exports.getIndexForFlags = getIndexForFlags = (flags) ->
 
 	if flags? then flagsToIndex(possibleFlags, flags) else 0
 
-AwesomeParticlePainter = require '../AwesomeParticlePainter'
+ParticlePainter = require '../ParticlePainter'
