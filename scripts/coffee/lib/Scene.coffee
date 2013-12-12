@@ -31,6 +31,8 @@ module.exports = class Scene
 
 		@debug = Boolean debug
 
+		@_clearColor = new Float32Array [0, 0, 0, 1]
+
 		@_setCanvas idOrCanvas
 
 		@_children = []
@@ -42,6 +44,8 @@ module.exports = class Scene
 		@_setCurrentCamera new NoCamera @
 
 		@atlas = new AtlasRepo @
+
+
 
 	getCurrentCamera: ->
 
@@ -154,7 +158,7 @@ module.exports = class Scene
 
 		@_gila.setViewportDims 0, 0, @_dims.width, @_dims.height
 
-		@_gila.setClearColor 0, 0, 0.1, 1
+		do @_applyClearColor
 
 		@_gila.blending.enable()
 
@@ -164,6 +168,26 @@ module.exports = class Scene
 		.update()
 
 		return
+
+	bg: (r, g, b, a = 1) ->
+
+		@_clearColor[0] = r
+		@_clearColor[1] = g
+		@_clearColor[2] = b
+		@_clearColor[3] = a
+
+		do @_applyClearColor
+
+		@
+
+	_applyClearColor: ->
+
+		@_gila.setClearColor @_clearColor[0], @_clearColor[1],
+
+			@_clearColor[2], @_clearColor[3]
+
+		return
+
 
 	_adopt: (el) ->
 
