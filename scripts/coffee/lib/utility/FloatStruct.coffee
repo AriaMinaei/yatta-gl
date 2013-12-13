@@ -16,39 +16,49 @@ module.exports = class FloatStruct
 
 		@_normalized = {}
 
+		@_defaults = {}
+
 		@_prepared = no
 
 		@_elements = []
 
 		@_stride = 0
 
-	_add: (place, name, size, normalized = no) ->
+	_add: (place, name, size, defaults = null, normalized = no) ->
 
 		@[place][name] = parseInt size
 
 		@_normalized[name] = Boolean normalized
 
+		if Array.isArray defaults
+
+			if defaults.length isnt size
+
+				throw Error "Length of the `defaults` doesn't match elemen't size"
+
+			@_defaults[name] = defaults
+
 		@
 
-	float: (name, size) ->
+	float: (name, size, defaults) ->
 
-		@_add '_floats', name, size
+		@_add '_floats', name, size, defaults
 
-	byte: (name, size, normalized) ->
+	byte: (name, size, defaults, normalized) ->
 
-		@_add '_bytes', name, size, normalized
+		@_add '_bytes', name, size, defaults, normalized
 
-	unsignedByte: (name, size, normalized) ->
+	unsignedByte: (name, size, defaults, normalized) ->
 
-		@_add '_unsignedBytes', name, size, normalized
+		@_add '_unsignedBytes', name, size, defaults, normalized
 
-	short: (name, size, normalized) ->
+	short: (name, size, defaults, normalized) ->
 
-		@_add '_shorts', name, size, normalized
+		@_add '_shorts', name, size, defaults, normalized
 
-	unsignedShort: (name, size, normalized) ->
+	unsignedShort: (name, size, defaults, normalized) ->
 
-		@_add '_unsignedShorts', name, size, normalized
+		@_add '_unsignedShorts', name, size, defaults, normalized
 
 	_addEl: (glType, jsType, name, size, len, normalized, offset) ->
 
@@ -142,7 +152,13 @@ module.exports = class FloatStruct
 
 		for el in @_elements
 
-			params[el.name] = new el.jsType buffer, el.offset, el.size
+			params[el.name] = p = new el.jsType buffer, el.offset, el.size
+
+			def = @_defaults[el.name]
+
+			if def?
+
+				p.set def
 
 		params
 

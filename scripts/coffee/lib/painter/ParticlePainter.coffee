@@ -14,11 +14,13 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_struct = new FloatStruct
 
-		@_struct.float 'size', 1
+		@_struct.float 'size', 1, [1]
 
 		@_struct.float 'pos', 3
 
-		@_struct.float 'opacity', 1
+		@_struct.float 'opacity', 1, [1]
+
+		# @_struct.short 'enabled', 1
 
 		@_baseParams.blending = 0
 
@@ -50,7 +52,7 @@ module.exports = class ParticlePainter extends _Painter
 
 		else
 
-			@_struct.unsignedByte 'color', 4, yes
+			@_struct.unsignedByte 'color', 4, [255, 255, 255, 255], yes
 
 		if flags.maskWithImage
 
