@@ -133,24 +133,6 @@ module.exports = class Api_
 
 		@
 
-	# noBlend: ->
-
-	# 	@_params.blending = 0
-
-	# 	@
-
-	# blendAsTransparent: ->
-
-	# 	@_params.blending = 1
-
-	# 	@
-
-	# blendAsAdd: ->
-
-		# @_params.blending = 2
-
-		# @
-
 	tint: (r, g, b, intensity) ->
 
 		@_params.tint[0] = r
@@ -160,13 +142,13 @@ module.exports = class Api_
 
 		@
 
-	enable: ->
+	_enable: ->
 
 		@_params.enabled[0] = 1
 
 		@
 
-	disable: ->
+	_disable: ->
 
 		@_params.enabled[0] = 0
 

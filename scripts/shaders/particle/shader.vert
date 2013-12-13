@@ -66,9 +66,7 @@ varying vec4 vTint;
 
 void main(void) {
 
-	if (enabled == 0.0) {
-		return;
-	}
+	if (enabled == 0.0) return;
 
 	#ifdef TINT
 

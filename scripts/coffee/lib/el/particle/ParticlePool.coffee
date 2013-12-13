@@ -2,54 +2,80 @@ module.exports = class ParticlePool
 
 	self = @
 
-	@_scenes: []
+	@makePool: (scene, count, flags) ->
 
-	@get: (el, flags, index) ->
+		new self scene, count, flags
 
-		indexesPool = self._scenes[el._scene.id]
+	constructor: (@scene, @count, @flags) ->
 
-		unless indexesPool?
+		@_index = painterRepo.getIndexForFlags @flags
 
-			indexesPool = self._scenes[el._scene.id] = {}
+		@_allElements = []
 
-		pool = indexesPool[index]
+		@_remainingElements = []
 
-		unless pool?
+		@_left = @count
 
-			pool = indexesPool[index] = new self flags, index
+		@_requestsForPaint = 0
 
-		pool.get el
+		do @_prepare
 
-	@take: (el) ->
+	_prepare: ->
 
-		self._scenes[el._scene.id][el._index].take el
+		@_painter = painterRepo.get @scene, @flags, @_index
 
-	constructor: (@flags, @index) ->
+		@_paramHolders = @_painter.makeParamHolders @count
 
-		@flags ?= {}
+		for i in [0...@count]
 
-		@_items = []
+			el = new Particle @scene, @, @_paramHolders[i], @flags, @_index
 
-		@_len = 0
-
-	get: (el) ->
-
-		if @_len > 0
-
-			@_len--
-
-			return @_prepare @_items.pop().putIn el
-
-		else
-
-			return new Particle el, @flags, @index
-
-	take: (el) ->
-
-		@_items.push el
-
-		@_len++
+			@_allElements.push el
+			@_remainingElements.push el
 
 		return
 
+	take: (el) ->
+
+		el._disable()
+
+		@_remainingElements.push el
+
+		@_left++
+
+		@
+
+	get: ->
+
+		if @_left is 0
+
+			throw Error "All elements in the pool are already in use"
+
+		@_left--
+
+		el = @_remainingElements.pop()
+
+		el._enable()
+
+		el
+
+	paint: ->
+
+		@_requestsForPaint++
+
+		if @_requestsForPaint is @count - @_left
+
+			@_requestsForPaint = 0
+
+			do @_paint
+
+		return
+
+	_paint: ->
+
+		@_painter.paint @_paramHolders
+
+		return
+
+painterRepo = require '../../painter/particlePainter/repo'
 Particle = require '../Particle'

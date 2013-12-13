@@ -5,51 +5,40 @@ Api_ = require './particle/Api_'
 
 module.exports = classic.mix Api_, class Particle extends _El
 
-	@create: (sceneOrEl, flags) ->
+	# @create: (sceneOrEl, flags) ->
 
-		index = painterRepo.getIndexForFlags flags
+	# 	index = painterRepo.getIndexForFlags flags
 
-		ParticlePool.get sceneOrEl, flags, index
+	# 	ParticlePool.get sceneOrEl, flags, index
 
-	@take: (el) ->
+	# @take: (el) ->
 
-		ParticlePool.take el
+	# 	ParticlePool.take el
 
-		return
+	# 	return
 
-	constructor: (sceneOrEl, flags, index) ->
+	@pool: (scene, count, flags) ->
 
-		super
+		ParticlePool.makePool scene, count, flags
 
-		@_init flags, index
-
-	quit: ->
+	constructor: (sceneOrEl, pool, params, flags, index) ->
 
 		super
 
-		self.take @
-
-		return
+		@_init pool, params, flags, index
 
 	_respondToParentChange: ->
 
 		return
 
-	_init: (@_flags, @_index) ->
-
-		@_painter = painterRepo.get @_scene, @_flags, @_index
-
-		@_params = @_painter.makeParamHolder()
+	_init: (@_pool, @_params, @_flags, @_index) ->
 
 		return
 
 	_redraw: ->
 
-		p = @_painter
-
-		p.paint @_params
+		@_pool.paint()
 
 		return
 
 ParticlePool = require './particle/ParticlePool'
-

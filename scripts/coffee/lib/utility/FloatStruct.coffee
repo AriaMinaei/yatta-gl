@@ -162,6 +162,42 @@ module.exports = class FloatStruct
 
 		params
 
+	makeParamHolders: (base, count) ->
+
+		do @_prepare
+
+		count = parseInt count
+
+		if count < 1
+
+			throw Error "`count` must be a positive integer"
+
+		buffer = new ArrayBuffer @_stride * count
+
+		holders = []
+
+		holders.buffer = buffer
+
+		for i in [0...count]
+
+			holder = if base? then object.clone base else {}
+
+			holder.__buffer = buffer
+
+			for el in @_elements
+
+				holder[el.name] = p = new el.jsType buffer, el.offset + (@_stride * i), el.size
+
+				def = @_defaults[el.name]
+
+				if def?
+
+					p.set def
+
+			holders.push holder
+
+		holders
+
 	getElements: ->
 
 		do @_prepare

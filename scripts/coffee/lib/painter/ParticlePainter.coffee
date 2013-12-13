@@ -28,29 +28,27 @@ module.exports = class ParticlePainter extends _Painter
 
 			@_struct.float 'tint', 4
 
-		if flags.blending?
+		switch flags.blending
 
-			switch flags.blending
+			when no
 
-				when no
+				@_blendingMode = 0
 
-					@_baseParams.blending = 0
+			when yes
 
-				when yes
+				@_blendingMode = 1
 
-					@_baseParams.blending = 1
+			when 'transparent'
 
-				when 'transparent'
+				@_blendingMode = 1
 
-					@_baseParams.blending = 1
+			when 'add'
 
-				when 'add'
+				@_blendingMode = 2
 
-					@_baseParams.blending = 2
+			else
 
-				else
-
-					@_baseParams.blending = 0
+				@_blendingMode = 0
 
 		if flags.fillWithImage
 
@@ -95,6 +93,10 @@ module.exports = class ParticlePainter extends _Painter
 	makeParamHolder: ->
 
 		@_struct.makeParamHolder @_baseParams
+
+	makeParamHolders: (count) ->
+
+		@_struct.makeParamHolders @_baseParams, count
 
 	_init: (scene, @flags, @index) ->
 
@@ -176,13 +178,9 @@ module.exports = class ParticlePainter extends _Painter
 
 		return
 
-	_applyBlending: (newBlending) ->
+	_applyBlending: ->
 
-		return if @_currentBlending is newBlending
-
-		@_currentBlending = newBlending
-
-		if newBlending is 0
+		if @_blendingMode is 0
 
 			@_gila.blending.disable()
 
@@ -190,7 +188,7 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_gila.blending.enable()
 
-		switch newBlending
+		switch @_blendingMode
 
 			when 1
 
@@ -208,66 +206,76 @@ module.exports = class ParticlePainter extends _Painter
 
 		return
 
-	paint: (params) ->
-
-		# start by activating the program
-		@_program.activate()
+	_prepareParamHolder: (holder) ->
 
 		# fillWithImage
-		if @flags.fillWithImage and params.fillWithImageProps.updated
+		if @flags.fillWithImage and holder.fillWithImageProps.updated
 
 			# get atlas data of the element's image
-			image = @_scene.atlas.getImageData params.fillWithImageProps.image
+			image = @_scene.atlas.getImageData holder.fillWithImageProps.image
 
 			# prepare the atls texture, if it's not already
 			@_prepareImageAtlasTexture image.atlasUrl
 
 			# the shader needs to know the coordinates of the image
 			# in the shader atlas
-			params.fillWithImageCoords.set image.coords
+			holder.fillWithImageCoords.set image.coords
 
 			# Let's not redo all this agian
-			params.fillWithImageProps.updated = no
+			holder.fillWithImageProps.updated = no
 
 		# maskWithImage
-		if @flags.maskWithImage and params.maskWithImageProps.updated
+		if @flags.maskWithImage and holder.maskWithImageProps.updated
 
 			# get atlas data of the element's image
-			image = @_scene.atlas.getImageData params.maskWithImageProps.image
+			image = @_scene.atlas.getImageData holder.maskWithImageProps.image
 
 			# prepare the atls texture, if it's not already
 			@_prepareImageAtlasTexture image.atlasUrl
 
 			# the shader needs to know the coordinates of the image
 			# in the shader atlas
-			params.maskWithImageCoords.set image.coords
+			holder.maskWithImageCoords.set image.coords
 
-			params.maskWithImageChannel[0] = params.maskWithImageProps.channel || 0
+			holder.maskWithImageChannel[0] = holder.maskWithImageProps.channel || 0
 
 			# Let's not redo all this agian
-			params.maskWithImageProps.updated = no
+			holder.maskWithImageProps.updated = no
 
 		# maskWithImage
-		if @flags.maskOnImage and params.maskOnImageProps.updated
+		if @flags.maskOnImage and holder.maskOnImageProps.updated
 
 			# get atlas data of the element's image
-			image = @_scene.atlas.getImageData params.maskOnImageProps.image
+			image = @_scene.atlas.getImageData holder.maskOnImageProps.image
 
 			# prepare the atls texture, if it's not already
 			@_preparePictureAtlasTexture image.atlasUrl
 
 			# the shader needs to know the coordinates of the image
 			# in the shader atlas
-			params.maskOnImageCoords.set image.coords
+			holder.maskOnImageCoords.set image.coords
 
-			# params.maskOnImageCoords[2] = 0.7
+			# holder.maskOnImageCoords[2] = 0.7
 
 			# Let's not redo all this agian
-			params.maskOnImageProps.updated = no
+			holder.maskOnImageProps.updated = no
+
+		return
+
+	paint: (holders) ->
+
+		# start by activating the program
+		@_program.activate()
+
+		for holder in holders
+
+			@_prepareParamHolder holder
 
 		# all done with attributes, let's send it over
-		@_theBuffer.data params.__buffer
+		@_theBuffer.streamData holders.buffer
 
-		@_applyBlending params.blending
+		do @_applyBlending
 
-		@_gila.drawPoints 0, 1
+		@_gila.drawPoints 0, holders.length
+
+		return
