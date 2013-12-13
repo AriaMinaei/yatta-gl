@@ -22,11 +22,35 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_struct.short 'enabled', 1, [1]
 
-		@_baseParams.blending = 0
+
 
 		if flags.tint
 
 			@_struct.float 'tint', 4
+
+		if flags.blending?
+
+			switch flags.blending
+
+				when no
+
+					@_baseParams.blending = 0
+
+				when yes
+
+					@_baseParams.blending = 1
+
+				when 'transparent'
+
+					@_baseParams.blending = 1
+
+				when 'add'
+
+					@_baseParams.blending = 2
+
+				else
+
+					@_baseParams.blending = 0
 
 		if flags.fillWithImage
 

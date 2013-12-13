@@ -1,6 +1,6 @@
 {flagsToIndex} = require 'gila'
 
-module.exports.possibleFlags = possibleFlags = ['fillWithImage', 'maskWithImage', 'maskOnImage', 'tint']
+module.exports.possibleFlags = possibleFlags = ['fillWithImage', 'maskWithImage', 'maskOnImage', 'tint', 'blending']
 
 module.exports.repo = repo = {}
 
