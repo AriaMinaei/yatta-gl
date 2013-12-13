@@ -159,3 +159,15 @@ module.exports = class Api_
 		@_params.tint[3] = intensity
 
 		@
+
+	enable: ->
+
+		@_params.enabled[0] = 1
+
+		@
+
+	disable: ->
+
+		@_params.enabled[0] = 0
+
+		@

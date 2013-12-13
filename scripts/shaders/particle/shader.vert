@@ -8,6 +8,8 @@ attribute float opacity;
 
 varying float vOpacity;
 
+attribute float enabled;
+
 // Dimensions of the canvas (perceived dimensions), divided in 2.
 // We'll use this to convert clip-space coords to window-space coords
 uniform vec2 win;
@@ -63,6 +65,10 @@ varying vec4 vTint;
 #endif
 
 void main(void) {
+
+	if (enabled == 0.0) {
+		return;
+	}
 
 	#ifdef TINT
 

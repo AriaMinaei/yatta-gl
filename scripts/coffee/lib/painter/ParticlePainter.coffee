@@ -20,7 +20,7 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_struct.float 'opacity', 1, [1]
 
-		# @_struct.short 'enabled', 1
+		@_struct.short 'enabled', 1, [1]
 
 		@_baseParams.blending = 0
 
