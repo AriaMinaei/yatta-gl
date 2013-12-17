@@ -22,8 +22,6 @@ module.exports = class ParticlePainter extends _Painter
 
 		@_struct.short 'enabled', 1, [1]
 
-
-
 		if flags.tint
 
 			@_struct.float 'tint', 4

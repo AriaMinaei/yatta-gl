@@ -87,5 +87,3 @@ module.exports = class _El
 	hasParent: ->
 
 		@parent?
-
-Scene = require './Scene'

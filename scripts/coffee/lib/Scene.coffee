@@ -37,6 +37,8 @@ module.exports = class Scene
 
 		@_children = []
 
+		@_pools = []
+
 		do @_initTiming
 
 		@_textureRepo = new TextureRepo @
@@ -44,8 +46,6 @@ module.exports = class Scene
 		@_setCurrentCamera new NoCamera @
 
 		@atlas = new AtlasRepo @
-
-
 
 	getCurrentCamera: ->
 
@@ -108,6 +108,8 @@ module.exports = class Scene
 	_redraw: ->
 
 		@_gila.clear()
+
+		pool._redraw() for pool in @_pools
 
 		child._redraw() for child in @_children
 
@@ -180,7 +182,6 @@ module.exports = class Scene
 			@_clearColor[2], @_clearColor[3]
 
 		return
-
 
 	_adopt: (el) ->
 
