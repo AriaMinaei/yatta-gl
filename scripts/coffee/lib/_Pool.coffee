@@ -20,7 +20,7 @@ module.exports = class _Pool
 
 	quit: ->
 
-		throw Error "All pools must have a quit method"
+		throw Error "Pool has not implemented a quit method"
 
 	_redraw: ->
 

@@ -1,4 +1,4 @@
-FloatStruct = require '../utility/FloatStruct'
+Esterakt = require 'esterakt'
 _Painter = require '../_Painter'
 shaders = require './ParticlePainter/shaders'
 
@@ -12,7 +12,7 @@ module.exports = class ParticlePainter extends _Painter
 
 		flags = @flags
 
-		@_struct = new FloatStruct
+		@_struct = new Esterakt
 
 		@_struct.float 'size', 1, [1]
 

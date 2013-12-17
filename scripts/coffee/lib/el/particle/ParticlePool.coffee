@@ -1,4 +1,6 @@
-module.exports = class ParticlePool
+_Pool = require '../../_Pool'
+
+module.exports = class ParticlePool extends _Pool
 
 	self = @
 
@@ -6,7 +8,9 @@ module.exports = class ParticlePool
 
 		new self scene, count, flags
 
-	constructor: (@scene, @count, @flags) ->
+	constructor: (@_scene, @count, @flags) ->
+
+		super
 
 		@_index = painterRepo.getIndexForFlags @flags
 
@@ -22,13 +26,13 @@ module.exports = class ParticlePool
 
 	_prepare: ->
 
-		@_painter = painterRepo.get @scene, @flags, @_index
+		@_painter = painterRepo.get @_scene, @flags, @_index
 
 		@_paramHolders = @_painter.makeParamHolders @count
 
 		for i in [0...@count]
 
-			el = new Particle @scene, @, @_paramHolders[i], @flags, @_index
+			el = new Particle @_scene, @, @_paramHolders[i], @flags, @_index
 
 			@_allElements.push el
 			@_remainingElements.push el
