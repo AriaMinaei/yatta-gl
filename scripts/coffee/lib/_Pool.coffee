@@ -2,19 +2,21 @@ module.exports = class _Pool
 
 	constructor: (scene) ->
 
-		@_timing = @_scene.timing
-
 		@putIn scene
 
 	putIn: (scene) ->
 
-		if @_scene? and @_scene isnt scene
+		if @_scene isnt scene
 
-			@_scene._removePool @
+			if @_scene?
+
+				@_scene._notYourChildAnymore @
 
 			@_scene = scene
 
-			@_scene._addPool @
+			@_scene._adopt @
+
+		@_timing = @_scene.timing
 
 		@
 

@@ -1,4 +1,4 @@
-module.exports = class Api_
+module.exports = class ParticleApi_
 
 	size: (x) ->
 
@@ -109,27 +109,19 @@ module.exports = class Api_
 
 	fillWithImage: (image) ->
 
-		@_params.fillWithImageProps.image = String image
-
-		@_params.fillWithImageProps.updated = yes
+		@_painter.updateFillWithImage @_params, image
 
 		@
 
 	maskOnImage: (image) ->
 
-		@_params.maskOnImageProps.image = String image
-
-		@_params.maskOnImageProps.updated = yes
+		@_painter.updateMaskOnImage @_params, image
 
 		@
 
 	maskWithImage: (image, channel) ->
 
-		@_params.maskWithImageProps.image = String image
-
-		@_params.maskWithImageProps.channel = parseInt(channel) || 0
-
-		@_params.maskWithImageProps.updated = yes
+		@_painter.updateMaskWithImage @_params, image, channel
 
 		@
 

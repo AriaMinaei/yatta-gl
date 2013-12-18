@@ -1,10 +1,36 @@
 Esterakt = require 'esterakt'
-_Painter = require '../_Painter'
 shaders = require './ParticlePainter/shaders'
 
-module.exports = class ParticlePainter extends _Painter
+module.exports = class ParticlePainter
 
-	self = @
+	constructor: (@_scene, @flags) ->
+
+		@_gila = @_scene._gila
+
+		@_init @_scene
+
+	_init: ->
+
+		@_currentBlending = -1
+
+		@_program = do @_getProgram
+
+		@_program.activate()
+
+		@_uniforms =
+
+			win: @_program.uniform('2f', 'win')
+			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
+
+		@_imageAtlasTexture = null
+
+		@_pictureAtlasTexture = null
+
+		do @_setupDataStructure
+
+		@_theBuffer = @_gila.makeArrayBuffer()
+
+		do @_setupAttribs
 
 	_setupDataStructure: ->
 
@@ -51,7 +77,7 @@ module.exports = class ParticlePainter extends _Painter
 		if flags.fillWithImage
 
 			# These will be set in the element api
-			@_baseParams.fillWithImageProps = image: null, updated: no
+			@_baseParams.fillWithImageProps = image: null
 
 			# The attribute to the coordinates of the image in the atlas
 			@_struct.float 'fillWithImageCoords', 4
@@ -62,7 +88,7 @@ module.exports = class ParticlePainter extends _Painter
 		else if flags.maskOnImage
 
 			# These will be set in the element api
-			@_baseParams.maskOnImageProps = image: null, updated: no
+			@_baseParams.maskOnImageProps = image: null
 
 			# The attribute to the coordinates of the image in the atlas
 			@_struct.float 'maskOnImageCoords', 4
@@ -77,7 +103,7 @@ module.exports = class ParticlePainter extends _Painter
 		if flags.maskWithImage
 
 			# These will be set in the element api
-			@_baseParams.maskWithImageProps = image: null, updated: no, channel: 0
+			@_baseParams.maskWithImageProps = image: null, channel: 0
 
 			# The attribute to the coordinates of the image in the atlas
 			@_struct.float 'maskWithImageCoords', 4
@@ -95,27 +121,6 @@ module.exports = class ParticlePainter extends _Painter
 	makeParamHolders: (count) ->
 
 		@_struct.makeParamHolders @_baseParams, count
-
-	_init: (scene, @flags, @index) ->
-
-		@_currentBlending = -1
-
-		@_program = do @_getProgram
-
-		@_program.activate()
-
-		@_uniforms =
-
-			win: @_program.uniform('2f', 'win')
-			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
-
-		@_imageAtlasTexture = null
-
-		do @_setupDataStructure
-
-		@_theBuffer = @_gila.makeArrayBuffer()
-
-		do @_setupAttribs
 
 	_getProgram: ->
 
@@ -202,78 +207,70 @@ module.exports = class ParticlePainter extends _Painter
 				.dst.one()
 				.update()
 
-		return
+	updateFillWithImage: (holder, image) ->
 
-	_prepareParamHolder: (holder) ->
+		holder.fillWithImageProps.image = image
 
-		# fillWithImage
-		if @flags.fillWithImage and holder.fillWithImageProps.updated
+		# get atlas data of the element's image
+		image = @_scene.atlas.getImageData image
 
-			# get atlas data of the element's image
-			image = @_scene.atlas.getImageData holder.fillWithImageProps.image
+		# prepare the atls texture, if it's not already
+		@_prepareImageAtlasTexture image.atlasUrl
 
-			# prepare the atls texture, if it's not already
-			@_prepareImageAtlasTexture image.atlasUrl
-
-			# the shader needs to know the coordinates of the image
-			# in the shader atlas
-			holder.fillWithImageCoords.set image.coords
-
-			# Let's not redo all this agian
-			holder.fillWithImageProps.updated = no
-
-		# maskWithImage
-		if @flags.maskWithImage and holder.maskWithImageProps.updated
-
-			# get atlas data of the element's image
-			image = @_scene.atlas.getImageData holder.maskWithImageProps.image
-
-			# prepare the atls texture, if it's not already
-			@_prepareImageAtlasTexture image.atlasUrl
-
-			# the shader needs to know the coordinates of the image
-			# in the shader atlas
-			holder.maskWithImageCoords.set image.coords
-
-			holder.maskWithImageChannel[0] = holder.maskWithImageProps.channel || 0
-
-			# Let's not redo all this agian
-			holder.maskWithImageProps.updated = no
-
-		# maskWithImage
-		if @flags.maskOnImage and holder.maskOnImageProps.updated
-
-			# get atlas data of the element's image
-			image = @_scene.atlas.getImageData holder.maskOnImageProps.image
-
-			# prepare the atls texture, if it's not already
-			@_preparePictureAtlasTexture image.atlasUrl
-
-			# the shader needs to know the coordinates of the image
-			# in the shader atlas
-			holder.maskOnImageCoords.set image.coords
-
-			# holder.maskOnImageCoords[2] = 0.7
-
-			# Let's not redo all this agian
-			holder.maskOnImageProps.updated = no
+		# the shader needs to know the coordinates of the image
+		# in the shader atlas
+		holder.fillWithImageCoords.set image.coords
 
 		return
 
-	paint: (holders) ->
+	updateMaskOnImage: (holder, image) ->
 
-		# start by activating the program
+		holder.maskOnImageProps.image = image
+
+		# get atlas data of the element's image
+		image = @_scene.atlas.getImageData image
+
+		# prepare the atls texture, if it's not already
+		@_preparePictureAtlasTexture image.atlasUrl
+
+		# the shader needs to know the coordinates of the image
+		# in the shader atlas
+		holder.maskOnImageCoords.set image.coords
+
+		return
+
+	updateMaskWithImage: (holder, image, channel) ->
+
+		holder.maskWithImageProps.image = image
+
+		channel = parseInt(channel) || 0
+
+		holder.maskWithImageProps.channel = channel
+
+		# get atlas data of the element's image
+		image = @_scene.atlas.getImageData image
+
+		# prepare the atls texture, if it's not already
+		@_prepareImageAtlasTexture image.atlasUrl
+
+		# the shader needs to know the coordinates of the image
+		# in the shader atlas
+		holder.maskWithImageCoords.set image.coords
+
+		holder.maskWithImageChannel[0] = channel
+
+		return
+
+	paint: (buffer, count) ->
+
 		@_program.activate()
 
-		for holder in holders
-
-			@_prepareParamHolder holder
-
-		# all done with attributes, let's send it over
-		@_theBuffer.streamData holders.buffer
+		@_theBuffer.streamData buffer
 
 		do @_applyBlending
 
-		@_gila.drawPoints 0, holders.length
+		@_gila.drawPoints 0, count
 
 		return
+
+	@possibleFlags: ['fillWithImage', 'maskWithImage', 'maskOnImage', 'tint', 'blending']
