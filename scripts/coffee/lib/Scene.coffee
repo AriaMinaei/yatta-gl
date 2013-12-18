@@ -37,8 +37,6 @@ module.exports = class Scene
 
 		@_children = []
 
-		@_pools = []
-
 		do @_initTiming
 
 		@_textureRepo = new TextureRepo @
@@ -69,8 +67,6 @@ module.exports = class Scene
 
 		@_rafId = Timing.requestAnimationFrame @_boundTick
 
-		do @_scheduleRedraw
-
 		return
 
 	eachFrame: (cb) ->
@@ -97,10 +93,6 @@ module.exports = class Scene
 
 		@timing.tick t
 
-		if @_shouldRedraw
-
-			@_shouldRedraw = no
-
 		do @_redraw
 
 		return
@@ -109,17 +101,7 @@ module.exports = class Scene
 
 		@_gila.clear()
 
-		pool._redraw() for pool in @_pools
-
 		child._redraw() for child in @_children
-
-		return
-
-	_scheduleRedraw: ->
-
-		return if @_shouldRedraw
-
-		@_shouldRedraw = yes
 
 		return
 
@@ -142,7 +124,6 @@ module.exports = class Scene
 			throw Error "canvas must be a canvas element"
 
 		@canvas = canvas
-
 
 		@_dims.width = canvas.width
 		@_dims.height = canvas.height
@@ -184,8 +165,6 @@ module.exports = class Scene
 		return
 
 	_adopt: (el) ->
-
-		do @_scheduleRedraw
 
 		@_children.push el
 
