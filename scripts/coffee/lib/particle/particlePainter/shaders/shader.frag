@@ -18,7 +18,7 @@ varying vec4 vTint;
 
 	varying vec4 vMaskOnImageCoords;
 
-	uniform sampler2D pictureAtlasSlot;
+	uniform sampler2D pictureAtlasUnit;
 
 #else
 
@@ -27,7 +27,6 @@ varying vec4 vTint;
 #endif
 
 #if defined(MASKWITHIMAGE)
-
 
 	varying vec4 vMaskWithImageCoords;
 
@@ -38,7 +37,7 @@ varying vec4 vTint;
 
 #if defined(FILLWITHIMAGE) || defined(MASKWITHIMAGE)
 
-	uniform sampler2D imageAtlasSlot;
+	uniform sampler2D imageAtlasUnit;
 
 #endif
 
@@ -52,7 +51,7 @@ void main() {
 
 		vec4 fillColor = texture2D(
 
-			imageAtlasSlot,
+			imageAtlasUnit,
 
 			vec2(
 				vFillWithImageCoords[2] * pointCoord.x + vFillWithImageCoords[0],
@@ -71,7 +70,7 @@ void main() {
 
 		vec4 fillColor = texture2D(
 
-			pictureAtlasSlot,
+			pictureAtlasUnit,
 
 			vec2(
 				vMaskOnImageCoords[2] * coordOnMask.x + vMaskOnImageCoords[0],
@@ -93,7 +92,7 @@ void main() {
 		// let's sample all the colors first
 		vec4 _mask = texture2D(
 
-			imageAtlasSlot,
+			imageAtlasUnit,
 
 			vec2(
 				vMaskWithImageCoords[2] * pointCoord.x + vMaskWithImageCoords[0],

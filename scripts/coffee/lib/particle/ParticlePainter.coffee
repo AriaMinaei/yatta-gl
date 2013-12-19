@@ -7,10 +7,6 @@ module.exports = class ParticlePainter
 
 		@_gila = @_scene._gila
 
-		@_init @_scene
-
-	_init: ->
-
 		@_currentBlending = -1
 
 		@_program = do @_getProgram
@@ -83,7 +79,7 @@ module.exports = class ParticlePainter
 			@_struct.float 'fillWithImageCoords', 4
 
 			# We should enable the atlas
-			@_uniforms.imageAtlasSlot = @_program.uniform '1i', 'imageAtlasSlot'
+			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
 		else if flags.maskOnImage
 
@@ -94,7 +90,7 @@ module.exports = class ParticlePainter
 			@_struct.float 'maskOnImageCoords', 4
 
 			# We should enable the atlas
-			@_uniforms.pictureAtlasSlot = @_program.uniform '1i', 'pictureAtlasSlot'
+			@_uniforms.pictureAtlasUnit = @_program.uniform '1i', 'pictureAtlasUnit'
 
 		else
 
@@ -112,7 +108,7 @@ module.exports = class ParticlePainter
 			@_struct.float 'maskWithImageChannel', 1
 
 			# We should enable the atlas
-			@_uniforms.imageAtlasSlot = @_program.uniform '1i', 'imageAtlasSlot'
+			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
 	makeParamHolder: ->
 
@@ -162,9 +158,9 @@ module.exports = class ParticlePainter
 
 		@_imageAtlasTexture = @_scene._textureRepo.get imageUrl
 
-		@_uniforms.imageAtlasSlot.set 0
+		unit = @_imageAtlasTexture.assignToAUnit()
 
-		@_imageAtlasTexture.assignToSlot 0
+		@_uniforms.imageAtlasUnit.set unit
 
 		return
 
@@ -173,11 +169,10 @@ module.exports = class ParticlePainter
 		return if @_pictureAtlasTexture?
 
 		@_pictureAtlasTexture = @_scene._textureRepo.get imageUrl
-		# @_pictureAtlasTexture.flipY()
 
-		@_uniforms.pictureAtlasSlot.set 1
+		unit = @_pictureAtlasTexture.assignToAUnit()
 
-		@_pictureAtlasTexture.assignToSlot 1
+		@_uniforms.pictureAtlasUnit.set unit
 
 		return
 
