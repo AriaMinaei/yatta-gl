@@ -91,7 +91,6 @@ module.exports = class ParticleApi_
 		@_params.color[1] = g
 		@_params.color[2] = b
 		@_params.color[3] = a
-		console.log @_params.color
 
 		@
 
