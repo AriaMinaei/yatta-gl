@@ -109,7 +109,7 @@ void main() {
 			opacityMult = _mask[2];
 		} else if (vMaskWithImageChannel == 3.0) {
 			opacityMult = _mask[2];
-		} else if (vMaskWithImageChannel == 4.0) {
+		} else if (vMaskWithImageChannel == 3.0) {
 			opacityMult = (_mask[1] + _mask[2] + _mask[0]) / 3.0;
 		}
 
