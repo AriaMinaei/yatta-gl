@@ -119,7 +119,7 @@ module.exports = class ParticleApi_
 
 		@
 
-	maskWithImage: (image, channel) ->
+	maskWithImage: (image, channel = 4) ->
 
 		@_painter.updateMaskWithImage @_params, image, channel
 
