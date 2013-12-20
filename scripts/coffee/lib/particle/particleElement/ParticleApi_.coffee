@@ -84,13 +84,13 @@ module.exports = class ParticleApi_
 
 		@_params.zRotation[0]
 
-	color: (r, g, b, a = 255) ->
+	color: (r, g, b, a = 1) ->
 
 
-		@_params.color[0] = r
-		@_params.color[1] = g
-		@_params.color[2] = b
-		@_params.color[3] = a
+		@_params.color[0] = r * 255
+		@_params.color[1] = g * 255
+		@_params.color[2] = b * 255
+		@_params.color[3] = a * 255
 
 		@
 

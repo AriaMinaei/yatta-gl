@@ -3,7 +3,7 @@ shaders = require './ParticlePainter/shaders'
 
 module.exports = class ParticlePainter
 
-	constructor: (@_scene, @flags) ->
+	constructor: (@_scene, @flags, @_count) ->
 
 		@_gila = @_scene._gila
 
@@ -22,9 +22,11 @@ module.exports = class ParticlePainter
 
 		@_pictureAtlasTexture = null
 
+		@_buffers = {}
+
 		do @_setupDataStructure
 
-		@_theBuffer = @_gila.makeArrayBuffer()
+		do @_makeParamHolders
 
 		do @_setupAttribs
 
@@ -36,17 +38,19 @@ module.exports = class ParticlePainter
 
 		@_struct = new Esterakt
 
-		@_struct.float 'size', 1, [1]
+		@_struct.getContainer('pos').float 'pos', 3
 
-		@_struct.float 'pos', 3
+		container = @_struct.getContainer()
 
-		@_struct.float 'opacity', 1, [1]
+		container.float 'size', 1, [1]
 
-		@_struct.short 'enabled', 1, [1]
+		container.float 'opacity', 1, [1]
+
+		container.short 'enabled', 1, [1]
 
 		if flags.tint
 
-			@_struct.float 'tint', 4
+			container.float 'tint', 4
 
 		switch flags.blending
 
@@ -76,7 +80,7 @@ module.exports = class ParticlePainter
 			@_baseParams.fillWithImageProps = image: null
 
 			# The attribute to the coordinates of the image in the atlas
-			@_struct.float 'fillWithImageCoords', 4
+			container.float 'fillWithImageCoords', 4
 
 			# We should enable the atlas
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
@@ -87,14 +91,14 @@ module.exports = class ParticlePainter
 			@_baseParams.maskOnImageProps = image: null
 
 			# The attribute to the coordinates of the image in the atlas
-			@_struct.float 'maskOnImageCoords', 4
+			container.float 'maskOnImageCoords', 4
 
 			# We should enable the atlas
 			@_uniforms.pictureAtlasUnit = @_program.uniform '1i', 'pictureAtlasUnit'
 
 		else
 
-			@_struct.unsignedByte 'color', 4, [255, 255, 255, 255], yes
+			container.unsignedByte 'color', 4, [255, 255, 255, 255], yes
 
 		if flags.maskWithImage
 
@@ -102,21 +106,21 @@ module.exports = class ParticlePainter
 			@_baseParams.maskWithImageProps = image: null, channel: 0
 
 			# The attribute to the coordinates of the image in the atlas
-			@_struct.float 'maskWithImageCoords', 4
+			container.float 'maskWithImageCoords', 4
 
 			# The attribute to specify which color channel should be used for the mask
-			@_struct.float 'maskWithImageChannel', 1
+			container.float 'maskWithImageChannel', 1
 
 			# We should enable the atlas
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
-	makeParamHolder: ->
+	_makeParamHolders: ->
 
-		@_struct.makeParamHolder @_baseParams
+		@_holders = @_struct.makeParamHolders @_baseParams, @_count
 
-	makeParamHolders: (count) ->
+	getParamHolders: ->
 
-		@_struct.makeParamHolders @_baseParams, count
+		@_holders
 
 	_getProgram: ->
 
@@ -140,15 +144,21 @@ module.exports = class ParticlePainter
 
 		@_program.activate()
 
-		@_theBuffer.bind()
+		for name, container of @_struct.getContainers()
 
-		stride = @_struct.getStride()
+			@_buffers[name] = buffer = {}
 
-		for el in @_struct.getElements()
+			buffer.glBuffer = @_gila.makeArrayBuffer().bind()
 
-			@_program.attr(el.name).enable()._pointer el.size,
+			buffer.data = @_holders.__buffers[name]
 
-				el.glType, el.normalized, stride, el.offset
+			stride = container.getStride()
+
+			for el in container.getElements()
+
+				@_program.attr(el.name).enable()._pointer el.size,
+
+					el.glType, el.normalized, stride, el.offset
 
 		return
 
@@ -256,15 +266,23 @@ module.exports = class ParticlePainter
 
 		return
 
-	paint: (buffer, count) ->
+	_wireBuffers: ->
+
+		for name, buffer of @_buffers
+
+			buffer.glBuffer.streamData buffer.data
+
+		return
+
+	paint: ->
 
 		@_program.activate()
 
-		@_theBuffer.streamData buffer
+		do @_wireBuffers
 
 		do @_applyBlending
 
-		@_gila.drawPoints 0, count
+		@_gila.drawPoints 0, @_count
 
 		return
 

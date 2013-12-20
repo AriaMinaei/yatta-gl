@@ -20,9 +20,9 @@ module.exports = class ParticlePool extends _Pool
 
 	_prepare: ->
 
-		@_painter = new ParticlePainter @_scene, @flags
+		@_painter = new ParticlePainter @_scene, @flags, @count
 
-		@_paramHolders = @_painter.makeParamHolders @count
+		@_paramHolders = @_painter.getParamHolders()
 
 		for i in [0...@count]
 
@@ -59,6 +59,6 @@ module.exports = class ParticlePool extends _Pool
 
 	_redraw: ->
 
-		@_painter.paint @_paramHolders.buffer, @count
+		@_painter.paint @_paramHolders, @count
 
 		return

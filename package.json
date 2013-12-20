@@ -9,7 +9,8 @@
     "gila": "*",
     "arguman": "*",
     "raf-timing": "*",
-    "transformation": "*"
+    "transformation": "*",
+    "esterakt": "*"
 
   },
   "devDependencies": {
