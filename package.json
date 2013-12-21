@@ -1,13 +1,12 @@
 {
   "name": "yatta-gl",
   "version": "0.0.0",
-  "description": "Yatta in WebGL",
+  "description": "(work in progress)",
   "main": "scripts/js/lib/YattaGL.js",
   "dependencies": {
     "gl-matrix": "~2.0.0",
     "utila": "*",
     "gila": "*",
-    "arguman": "*",
     "raf-timing": "*",
     "transformation": "*",
     "esterakt": "*"
