@@ -57,6 +57,12 @@ module.exports = class ParticlePool extends _Pool
 
 		el
 
+	replacePositionData: (newData) ->
+
+		@_painter.replacePositionData newData
+
+		@
+
 	_redraw: ->
 
 		@_painter.paint @_paramHolders, @count

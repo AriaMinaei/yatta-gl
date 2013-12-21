@@ -9,7 +9,41 @@ module.exports = class ParticlePainter
 
 		@_currentBlending = -1
 
-		@_program = do @_getProgram
+		@_imageAtlasTexture = null
+
+		@_pictureAtlasTexture = null
+
+		do @_initProgram
+
+		do @_initUniforms
+
+		do @_initDataStructure
+
+		do @_initParamHolders
+
+		do @_initAttribs
+
+	_initProgram: ->
+
+		flagsInCaps = {}
+
+		for key, val of @flags
+
+			flagsInCaps[key.toUpperCase()] = val
+
+		vert = @_gila.getVertexShader 'particle-shader-vert',
+
+			shaders.vert, flagsInCaps
+
+		frag = @_gila.getFragmentShader 'particle-shader-frag',
+
+			shaders.frag, flagsInCaps
+
+		@_program = @_gila.getProgram vert, frag
+
+		return
+
+	_initUniforms: ->
 
 		@_program.activate()
 
@@ -18,19 +52,9 @@ module.exports = class ParticlePainter
 			win: @_program.uniform('2f', 'win')
 			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
 
-		@_imageAtlasTexture = null
+		return
 
-		@_pictureAtlasTexture = null
-
-		@_buffers = {}
-
-		do @_setupDataStructure
-
-		do @_makeParamHolders
-
-		do @_setupAttribs
-
-	_setupDataStructure: ->
+	_initDataStructure: ->
 
 		@_baseParams = {}
 
@@ -114,33 +138,17 @@ module.exports = class ParticlePainter
 			# We should enable the atlas
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
-	_makeParamHolders: ->
+	_initParamHolders: ->
 
 		@_holders = @_struct.makeParamHolders @_baseParams, @_count
 
-	getParamHolders: ->
+		@_uint8ViewOfPositionData = @_holders.__uint8Views.pos
 
-		@_holders
+		return
 
-	_getProgram: ->
+	_initAttribs: ->
 
-		flagsInCaps = {}
-
-		for key, val of @flags
-
-			flagsInCaps[key.toUpperCase()] = val
-
-		vert = @_gila.getVertexShader 'particle-shader-vert',
-
-			shaders.vert, flagsInCaps
-
-		frag = @_gila.getFragmentShader 'particle-shader-frag',
-
-			shaders.frag, flagsInCaps
-
-		@_gila.getProgram vert, frag
-
-	_setupAttribs: ->
+		@_buffers = {}
 
 		@_program.activate()
 
@@ -161,6 +169,16 @@ module.exports = class ParticlePainter
 					el.glType, el.normalized, stride, el.offset
 
 		return
+
+	replacePositionData: (newData) ->
+
+		@_uint8ViewOfPositionData.set newData
+
+		return
+
+	getParamHolders: ->
+
+		@_holders
 
 	_prepareImageAtlasTexture: (imageUrl) ->
 
@@ -211,6 +229,8 @@ module.exports = class ParticlePainter
 				.src.srcAlpha()
 				.dst.one()
 				.update()
+
+		return
 
 	updateFillWithImage: (holder, image) ->
 
