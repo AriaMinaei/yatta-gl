@@ -176,6 +176,10 @@ module.exports = class ParticlePainter
 
 		return
 
+	getPositionData: ->
+
+		@_uint8ViewOfPositionData
+
 	getParamHolders: ->
 
 		@_holders

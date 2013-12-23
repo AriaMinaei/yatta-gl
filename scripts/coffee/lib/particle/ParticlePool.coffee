@@ -63,6 +63,10 @@ module.exports = class ParticlePool extends _Pool
 
 		@
 
+	getPositionData:
+
+		do @_painter.getPositionData
+
 	_redraw: ->
 
 		@_painter.paint @_paramHolders, @count
