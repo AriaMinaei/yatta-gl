@@ -39,7 +39,7 @@ module.exports = class ParticlePainter
 
 			shaders.frag, flagsInCaps
 
-		@_program = @_gila.getProgram vert, frag
+		@_program = @_gila.getProgram vert, frag, Math.random(), yes
 
 		return
 
@@ -176,10 +176,6 @@ module.exports = class ParticlePainter
 
 		return
 
-	getPositionData: ->
-
-		@_uint8ViewOfPositionData
-
 	getParamHolders: ->
 
 		@_holders
@@ -187,6 +183,8 @@ module.exports = class ParticlePainter
 	_prepareImageAtlasTexture: (imageUrl) ->
 
 		return if @_imageAtlasTexture?
+
+		@_program.activate()
 
 		@_imageAtlasTexture = @_scene._textureRepo.get imageUrl
 
@@ -199,6 +197,8 @@ module.exports = class ParticlePainter
 	_preparePictureAtlasTexture: (imageUrl) ->
 
 		return if @_pictureAtlasTexture?
+
+		@_program.activate()
 
 		@_pictureAtlasTexture = @_scene._textureRepo.get imageUrl
 
