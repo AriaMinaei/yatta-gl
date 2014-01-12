@@ -13,6 +13,18 @@ module.exports = class ParticlePainter
 
 		@_pictureAtlasTexture = null
 
+		@_useVao = @_gila.extensions.vao.isAvailable()
+
+		unless @_useVao
+
+			throw Error "Currently, we need OES_vertex_array_object extension to work"
+
+		else
+
+			@_vao = @_gila.extensions.vao.create()
+
+			@_vao.bind()
+
 		do @_initProgram
 
 		do @_initUniforms
@@ -22,6 +34,8 @@ module.exports = class ParticlePainter
 		do @_initParamHolders
 
 		do @_initAttribs
+
+		@_vao.unbind()
 
 	_initProgram: ->
 
@@ -39,7 +53,7 @@ module.exports = class ParticlePainter
 
 			shaders.frag, flagsInCaps
 
-		@_program = @_gila.getProgram vert, frag, Math.random(), yes
+		@_program = @_gila.getProgram vert, frag
 
 		return
 
@@ -300,6 +314,8 @@ module.exports = class ParticlePainter
 
 	paint: ->
 
+		@_vao.bind()
+
 		@_program.activate()
 
 		do @_wireBuffers
@@ -307,6 +323,8 @@ module.exports = class ParticlePainter
 		do @_applyBlending
 
 		@_gila.drawPoints 0, @_count
+
+		@_vao.unbind()
 
 		return
 
