@@ -51,7 +51,7 @@ module.exports = class ParticlePool extends _Pool
 
 		@_left--
 
-		el = @_remainingElements.pop()
+		el = @_remainingElements.shift()
 
 		el._enable()
 
