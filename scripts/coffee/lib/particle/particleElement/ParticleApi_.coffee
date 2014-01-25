@@ -60,7 +60,7 @@ module.exports = class ParticleApi_
 
 		@
 
-	move: (x, y, to) ->
+	move: (x, y, z) ->
 
 		@_params.pos[0] += x
 		@_params.pos[1] += y

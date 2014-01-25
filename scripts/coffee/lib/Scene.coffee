@@ -139,8 +139,6 @@ module.exports = class Scene
 
 		@_gila = new Gila @canvas, @debug
 
-		@_gila.setViewportDims 0, 0, @_dims.width, @_dims.height
-
 		do @_applyClearColor
 
 		return
