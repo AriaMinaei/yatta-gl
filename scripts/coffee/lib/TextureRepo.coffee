@@ -57,7 +57,7 @@ module.exports = class TextureRepo
 
 		unless @_textures[id]?
 
-			@_textures[id] = @_gila.makeTexture source
+			@_textures[id] = @_gila.makeImageTexture source
 
 			@_setTextureParams @_textures[id]
 
