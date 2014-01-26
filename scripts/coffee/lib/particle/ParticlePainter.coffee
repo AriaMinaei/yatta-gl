@@ -152,6 +152,10 @@ module.exports = class ParticlePainter
 			# We should enable the atlas
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
+		if flags.zRotation
+
+			container.float 'zRotation', 1
+
 	_initParamHolders: ->
 
 		@_holders = @_struct.makeParamHolders @_baseParams, @_count

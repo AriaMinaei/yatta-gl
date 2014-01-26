@@ -34,6 +34,12 @@ varying vec4 vTint;
 
 #endif
 
+#ifdef ZROTATION
+
+	varying float vZRotation;
+
+#endif
+
 
 #if defined(FILLWITHIMAGE) || defined(MASKWITHIMAGE)
 
@@ -44,6 +50,21 @@ varying vec4 vTint;
 void main() {
 
 	vec2 pointCoord = gl_PointCoord;
+
+	#ifdef ZROTATION
+
+		pointCoord -= 0.5;
+		pointCoord /= 1.4142135623;
+
+		pointCoord = vec2(
+			(cos(vZRotation) * pointCoord.x) - (sin(vZRotation) * pointCoord.y),
+			(sin(vZRotation) * pointCoord.x) + (cos(vZRotation) * pointCoord.y)
+
+		);
+
+		pointCoord += 0.5;
+
+	#endif
 
 	vec2 clipCoord = vec2((gl_FragCoord.x / win.x) - 0.5, (gl_FragCoord.y / win.y) - 0.5) * vec2(2.0);
 
