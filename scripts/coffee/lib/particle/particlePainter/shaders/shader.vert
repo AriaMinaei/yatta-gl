@@ -40,9 +40,17 @@ uniform vec2 win;
 
 #ifdef TINT
 
-attribute vec4 tint;
+	attribute vec4 tint;
 
-varying vec4 vTint;
+	varying vec4 vTint;
+
+#endif
+
+#ifdef ZROTATION
+
+	attribute float zRotation;
+
+	varying float vZRotation;
 
 #endif
 
@@ -71,6 +79,12 @@ void main(void) {
 	#ifdef TINT
 
 		vTint = tint;
+
+	#endif
+
+	#ifdef ZROTATION
+
+		vZRotation = zRotation;
 
 	#endif
 
