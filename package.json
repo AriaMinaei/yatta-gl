@@ -1,6 +1,6 @@
 {
   "name": "yatta-gl",
-  "version": "0.1.0-beta.5",
+  "version": "0.1.0-beta.6",
   "description": "(work in progress)",
   "main": "scripts/js/lib/YattaGL.js",
   "dependencies": {
@@ -13,7 +13,7 @@
     "options-to-index": "*"
   },
   "devDependencies": {
-
+    "coffee-script": "~1.6.3"
   },
   "scripts": {
 
