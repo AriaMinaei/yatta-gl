@@ -47,22 +47,19 @@ varying vec4 vTint;
 
 #endif
 
+#ifdef MOTIONBLUR
+
+	varying vec2 vVelocity;
+
+#endif
+
 void main() {
 
 	vec2 pointCoord = gl_PointCoord;
 
 	#ifdef ZROTATION
 
-		pointCoord -= 0.5;
-		pointCoord /= 1.4142135623;
-
-		pointCoord = vec2(
-			(cos(vZRotation) * pointCoord.x) - (sin(vZRotation) * pointCoord.y),
-			(sin(vZRotation) * pointCoord.x) + (cos(vZRotation) * pointCoord.y)
-
-		);
-
-		pointCoord += 0.5;
+		// include ./frag/zRotation.frag
 
 	#endif
 
@@ -70,34 +67,11 @@ void main() {
 
 	#ifdef FILLWITHIMAGE
 
-		vec4 fillColor = texture2D(
-
-			imageAtlasUnit,
-
-			vec2(
-				vFillWithImageCoords[2] * pointCoord.x + vFillWithImageCoords[0],
-				vFillWithImageCoords[3] * pointCoord.y + vFillWithImageCoords[1]
-				)
-			);
-
-
+		// include ./frag/fillWithImage.frag
 
 	#elif defined(MASKONIMAGE)
 
-		vec2 coordOnMask = vec2(
-			clipCoord.x / 2.0 + 0.5,
-			clipCoord.y / -2.0 + 0.5
-		);
-
-		vec4 fillColor = texture2D(
-
-			pictureAtlasUnit,
-
-			vec2(
-				vMaskOnImageCoords[2] * coordOnMask.x + vMaskOnImageCoords[0],
-				vMaskOnImageCoords[3] * coordOnMask.y + vMaskOnImageCoords[1]
-			)
-		);
+		// include ./frag/maskOnImage.frag
 
 	#else
 
@@ -110,29 +84,7 @@ void main() {
 	// masking with an image
 	#ifdef MASKWITHIMAGE
 
-		// let's sample all the colors first
-		vec4 _mask = texture2D(
-
-			imageAtlasUnit,
-
-			vec2(
-				vMaskWithImageCoords[2] * pointCoord.x + vMaskWithImageCoords[0],
-				vMaskWithImageCoords[3] * pointCoord.y + vMaskWithImageCoords[1]
-				)
-			);
-
-		// now choose a channel
-		if (vMaskWithImageChannel == 0.0) {
-			opacityMult = _mask[0];
-		} else if (vMaskWithImageChannel == 1.0) {
-			opacityMult = _mask[1];
-		} else if (vMaskWithImageChannel == 2.0) {
-			opacityMult = _mask[2];
-		} else if (vMaskWithImageChannel == 3.0) {
-			opacityMult = _mask[2];
-		} else if (vMaskWithImageChannel == 3.0) {
-			opacityMult = (_mask[1] + _mask[2] + _mask[0]) / 3.0;
-		}
+		//include ./frag/maskWithImage.frag
 
 	#endif
 

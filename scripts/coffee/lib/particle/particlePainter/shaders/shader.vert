@@ -72,9 +72,23 @@ uniform vec2 win;
 
 #endif
 
+#ifdef MOTIONBLUR
+
+	attribute vec2 velocity;
+
+	varying vec2 vVelocity;
+
+#endif
+
 void main(void) {
 
 	if (enabled == 0.0) return;
+
+	#ifdef MOTIONBLUR
+
+		vVelocity = velocity;
+
+	#endif
 
 	#ifdef TINT
 
