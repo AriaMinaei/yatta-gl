@@ -84,7 +84,7 @@ void main() {
 	// masking with an image
 	#ifdef MASKWITHIMAGE
 
-		//include ./frag/maskWithImage.frag
+		// include ./frag/maskWithImage.frag
 
 	#endif
 
@@ -95,6 +95,4 @@ void main() {
 	#endif
 
 	gl_FragColor = vec4(fillColor.rgb, fillColor[3] * opacityMult * vOpacity);
-	// gl_FragColor = vec4(fillColor.rgb, 1.0);
-
 }

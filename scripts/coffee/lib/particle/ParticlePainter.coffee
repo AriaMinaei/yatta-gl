@@ -148,6 +148,7 @@ module.exports = class ParticlePainter
 
 			# The attribute to specify which color channel should be used for the mask
 			container.float 'maskWithImageChannel', 1
+			# debugger
 
 			# We should enable the atlas
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
@@ -155,6 +156,10 @@ module.exports = class ParticlePainter
 		if flags.zRotation
 
 			container.float 'zRotation', 1
+
+		if flags.motionBlur
+
+			container.float 'velocity', 2
 
 	_initParamHolders: ->
 
@@ -198,13 +203,13 @@ module.exports = class ParticlePainter
 
 		@_holders
 
-	_prepareImageAtlasTexture: (imageUrl) ->
+	_prepareImageAtlasTexture: (image) ->
 
 		return if @_imageAtlasTexture?
 
 		@_program.activate()
 
-		@_imageAtlasTexture = @_scene._textureRepo.get imageUrl
+		@_imageAtlasTexture = image.getTexture()
 
 		unit = @_imageAtlasTexture.assignToAUnit()
 
@@ -212,13 +217,13 @@ module.exports = class ParticlePainter
 
 		return
 
-	_preparePictureAtlasTexture: (imageUrl) ->
+	_preparePictureAtlasTexture: (image) ->
 
 		return if @_pictureAtlasTexture?
 
 		@_program.activate()
 
-		@_pictureAtlasTexture = @_scene._textureRepo.get imageUrl
+		@_pictureAtlasTexture = image.getTexture()
 
 		unit = @_pictureAtlasTexture.assignToAUnit()
 
@@ -259,7 +264,7 @@ module.exports = class ParticlePainter
 		holder.fillWithImageProps.image = image
 
 		# get atlas data of the element's image
-		image = @_scene.atlas.getImageData image
+		image = @_scene.images.atlases.getImageData image
 
 		# prepare the atls texture, if it's not already
 		@_prepareImageAtlasTexture image.atlasUrl
@@ -275,7 +280,7 @@ module.exports = class ParticlePainter
 		holder.maskOnImageProps.image = image
 
 		# get atlas data of the element's image
-		image = @_scene.atlas.getImageData image
+		image = @_scene.images.atlases.getImageData image
 
 		# prepare the atls texture, if it's not already
 		@_preparePictureAtlasTexture image.atlasUrl
@@ -286,19 +291,23 @@ module.exports = class ParticlePainter
 
 		return
 
-	updateMaskWithImage: (holder, image, channel) ->
+	updateMaskWithImage: (holder, url, channel) ->
 
-		holder.maskWithImageProps.image = image
+		holder.maskWithImageProps.image = url
 
 		channel = parseInt(channel) || 0
 
 		holder.maskWithImageProps.channel = channel
 
 		# get atlas data of the element's image
-		image = @_scene.atlas.getImageData image
+		image = @_scene.images.get url
+
+		unless image.inAtlas
+
+			throw Error "All images associated with particles must be in an atlas"
 
 		# prepare the atls texture, if it's not already
-		@_prepareImageAtlasTexture image.atlasUrl
+		@_prepareImageAtlasTexture image
 
 		# the shader needs to know the coordinates of the image
 		# in the shader atlas
@@ -332,4 +341,4 @@ module.exports = class ParticlePainter
 
 		return
 
-	@possibleFlags: ['fillWithImage', 'maskWithImage', 'maskOnImage', 'tint', 'blending']
+	@possibleFlags: ['fillWithImage', 'maskWithImage', 'maskOnImage', 'tint', 'blending', 'zRotation', 'motionBlur']

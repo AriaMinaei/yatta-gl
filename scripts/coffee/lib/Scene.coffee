@@ -1,5 +1,4 @@
-TextureRepo = require './TextureRepo'
-AtlasRepo = require './AtlasRepo'
+ImageRepo = require './ImageRepo'
 Timing = require 'raf-timing'
 Gila = require 'gila'
 
@@ -39,11 +38,9 @@ module.exports = class Scene
 
 		do @_initTiming
 
-		@_textureRepo = new TextureRepo @
-
 		@_setCurrentCamera new NoCamera @
 
-		@atlas = new AtlasRepo @
+		@images = new ImageRepo @
 
 	getCurrentCamera: ->
 

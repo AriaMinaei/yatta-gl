@@ -84,6 +84,17 @@ module.exports = class ParticleApi_
 
 		@_params.zRotation[0]
 
+	setVelocity: (x, y) ->
+
+		@_params.velocity[0] = x
+		@_params.velocity[1] = y
+
+		@
+
+	getVelocity: ->
+
+		@_params.velocity
+
 	color: (r, g, b, a = 1) ->
 
 

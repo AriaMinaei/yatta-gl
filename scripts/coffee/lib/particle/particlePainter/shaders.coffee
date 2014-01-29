@@ -1,10 +1,8 @@
-#1?333333333333
+###################
 
 macro read (node) ->
 
-	macro.valToNode macro.require('black-sugar').concat macro.nodeToVal node
-
-	# String macro.require('fs').readFileSync macro.nodeToVal node
+	macro.valToNode macro.require('e:/open-source/black-sugar').concat macro.nodeToVal node
 
 module.exports.frag = read 'coffee/lib/particle/particlePainter/shaders/shader.frag'
 
