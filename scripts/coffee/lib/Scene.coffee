@@ -1,5 +1,6 @@
 ImageRepo = require './ImageRepo'
 Timing = require 'raf-timing'
+Layer = require './Layer'
 Gila = require 'gila'
 
 module.exports = class Scene
@@ -34,21 +35,41 @@ module.exports = class Scene
 
 		@_setCanvas idOrCanvas
 
-		@_children = []
-
 		do @_initTiming
-
-		@_setCurrentCamera new NoCamera @
 
 		@images = new ImageRepo @
 
-	getCurrentCamera: ->
+		@_layers = []
 
-		@_currentCamera
+		@_layerRenderingInstructions = []
 
-	_setCurrentCamera: (cam) ->
+		@_frameBuffers = []
 
-		@_currentCamera = cam
+	addLayer: (name) ->
+
+		l = new Layer @, name
+
+		@_layers.push l
+
+		do @_resetRenderingInstructions
+
+		l
+
+	_resetRenderingInstructions: ->
+
+		inst = @_layerRenderingInstructions
+
+		inst.length = 0
+
+		if @_layers.length is 1
+
+			return inst.push null
+
+		if @_layers.length is 2
+
+			if @_frameBuffers.length is 0
+
+				@_frameBuffers.push @_gila.makeFrameBuffer()
 
 		return
 
@@ -96,9 +117,13 @@ module.exports = class Scene
 
 	_redraw: ->
 
-		@_gila.clear()
+		for l, i in @_layers
 
-		child._redraw() for child in @_children
+			instruction = @_layerRenderingInstructions[i]
+
+			unless instruction?
+
+				l._redraw()
 
 		return
 
@@ -158,11 +183,3 @@ module.exports = class Scene
 			@_clearColor[2], @_clearColor[3]
 
 		return
-
-	_adopt: (el) ->
-
-		@_children.push el
-
-		return
-
-NoCamera = require './camera/NoCamera'

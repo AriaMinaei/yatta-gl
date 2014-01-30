@@ -1,22 +1,24 @@
 module.exports = class _Pool
 
-	constructor: (scene) ->
+	constructor: (layer) ->
 
-		@putIn scene
+		@putIn layer
 
-	putIn: (scene) ->
+	putIn: (layer) ->
 
-		if @_scene isnt scene
+		if @_layer isnt layer
 
-			if @_scene?
+			if @_layer?
 
-				@_scene._notYourChildAnymore @
+				@_layer._notYourChildAnymore @
 
-			@_scene = scene
+			@_layer = layer
 
-			@_scene._adopt @
+			@_layer._adopt @
 
-		@_timing = @_scene.timing
+		@_scene = @_layer._scene
+
+		@_timing = @_layer.timing
 
 		@
 
