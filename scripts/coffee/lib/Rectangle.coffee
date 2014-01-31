@@ -1,4 +1,4 @@
-shaders = require './filter/shaders'
+shaders = require './rectangle/shaders'
 
 rectangleVx = new Float32Array [
 	-1, -1,
@@ -10,15 +10,30 @@ rectangleVx = new Float32Array [
 	 1,  1
 ]
 
-module.exports = class Filter
+module.exports = class Rectangle
 
-	constructor: (@_layer) ->
+	constructor: (@_layer, imageUrl) ->
 
 		@_scene = @_layer._scene
 
 		@_layer._adopt @
 
 		@_gila = @_scene._gila
+
+		image = @_scene.images.get(imageUrl)
+
+		if image.inAtlas
+
+			throw Error "Rectangle doesn't support in-atlas images yet"
+
+		@imageTexture = image
+
+			.getATexture(no)
+			.wrapSClampToEdge()
+			.wrapTClampToEdge()
+			.magnifyWithLinear()
+			.minifyWithLinear()
+			.flipY()
 
 		do @_initProgram
 
@@ -36,13 +51,13 @@ module.exports = class Filter
 
 			@_vao.bind()
 
-		vert = @_gila.getVertexShader 'filter-shader-vert', shaders.vert
+		vert = @_gila.getVertexShader 'filter-rectangle-vert', shaders.vert
 
-		frag = @_gila.getFragmentShader 'filter-shader-frag', shaders.frag
+		frag = @_gila.getFragmentShader 'filter-rectangle-frag', shaders.frag
 
 		@_program = @_gila.getProgram vert, frag
 
-		@_layerBeneathUniform = @_program.uniform '1i', 'layerBeneath'
+		@_imageUniform = @_program.uniform '1i', 'image'
 
 		@_gila.makeArrayBuffer().staticData rectangleVx
 
@@ -52,17 +67,11 @@ module.exports = class Filter
 
 	_redraw: ->
 
-		prevFb = @_layer._prevFrameBuffer
-
-		unless prevFb?
-
-			throw Error "Filter needs access to a frame buffer"
-
 		@_vao.bind()
 
 		@_program.activate()
 
-		@_layerBeneathUniform.set prevFb.getColorTexture().assignToAUnit()
+		@_imageUniform.set @imageTexture.assignToAUnit()
 
 		@_gila.drawTriangles 0, 6
 

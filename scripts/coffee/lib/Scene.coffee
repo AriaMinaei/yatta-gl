@@ -50,6 +50,12 @@ module.exports = class Scene
 
 		@_frameBuffers = []
 
+		@_shouldRedraw = yes
+
+		window.onerror = =>
+
+			@_shouldRedraw = no
+
 	addLayer: (name) ->
 
 		l = new Layer @, name
@@ -136,6 +142,8 @@ module.exports = class Scene
 		return
 
 	_redraw: ->
+
+		return unless @_shouldRedraw
 
 		currentFbIndex = 0
 		currentFb = @_frameBuffers[0]
