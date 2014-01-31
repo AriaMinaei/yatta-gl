@@ -50,12 +50,6 @@ module.exports = class Scene
 
 		@_frameBuffers = []
 
-		@_shouldRedraw = yes
-
-		window.onerror = =>
-
-			@_shouldRedraw = no
-
 	addLayer: (name) ->
 
 		l = new Layer @, name
@@ -143,7 +137,7 @@ module.exports = class Scene
 
 	_redraw: ->
 
-		return unless @_shouldRedraw
+		return unless @_gila.textures.isReady
 
 		currentFbIndex = 0
 		currentFb = @_frameBuffers[0]
