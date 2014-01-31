@@ -3,6 +3,11 @@ Timing = require 'raf-timing'
 Layer = require './Layer'
 Gila = require 'gila'
 
+NONE  = 0
+START = 1
+SWAP  = 2
+END   = 3
+
 module.exports = class Scene
 
 	self = @
@@ -41,7 +46,7 @@ module.exports = class Scene
 
 		@_layers = []
 
-		@_layerRenderingInstructions = []
+		@_frameBufferInstructions = []
 
 		@_frameBuffers = []
 
@@ -51,25 +56,40 @@ module.exports = class Scene
 
 		@_layers.push l
 
-		do @_resetRenderingInstructions
+		do @_resetFrameBufferInstructions
 
 		l
 
-	_resetRenderingInstructions: ->
+	_resetFrameBufferInstructions: ->
 
-		inst = @_layerRenderingInstructions
+		inst = @_frameBufferInstructions
 
 		inst.length = 0
 
 		if @_layers.length is 1
 
-			return inst.push null
+			return inst.push NONE
 
-		if @_layers.length is 2
+		frameBuffersNeeded = Math.min(2, @_layers.length - 1)
 
-			if @_frameBuffers.length is 0
+		if @_frameBuffers.length < frameBuffersNeeded
+
+			for i in [@_frameBuffers.length..frameBuffersNeeded]
 
 				@_frameBuffers.push @_gila.makeFrameBuffer()
+
+					.bind()
+					.useRenderBufferForDepth()
+					.useTextureForColor()
+					.unbind()
+
+		inst.push START
+
+		for i in [1...@_layers.length - 1]
+
+			inst.push SWAP
+
+		inst.push END
 
 		return
 
@@ -117,13 +137,44 @@ module.exports = class Scene
 
 	_redraw: ->
 
+		currentFbIndex = 0
+		currentFb = @_frameBuffers[0]
+
 		for l, i in @_layers
 
-			instruction = @_layerRenderingInstructions[i]
+			instruction = @_frameBufferInstructions[i]
 
-			unless instruction?
+			prevFb = currentFb
+
+			if instruction is NONE
+
+				@_gila.clear()
 
 				l._redraw()
+
+			else if instruction is START
+
+				currentFb.bind()
+
+				@_gila.clear()
+
+				l._redraw()
+
+			else if instruction in [END, SWAP]
+
+				currentFb.unbind()
+
+				if instruction is SWAP
+
+					currentFbIndex = 1 - currentFbIndex
+
+					currentFb = @_frameBuffers[currentFbIndex]
+
+					currentFb.bind()
+
+					@_gila.clear()
+
+				l._redraw prevFb
 
 		return
 

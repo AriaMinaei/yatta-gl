@@ -5,27 +5,29 @@ module.exports = class _El
 
 	self = @
 
-	constructor: (sceneOrEl) ->
+	constructor: (layerOrEl) ->
 
 		exposeMethods @
 
 		@_children = []
 
-		@putIn sceneOrEl
+		@putIn layerOrEl
 
-	putIn: (sceneOrEl) ->
+	putIn: (layerOrEl) ->
 
-		sceneOrEl._adopt @
+		layerOrEl._adopt @
 
-		if sceneOrEl instanceof _El
+		if layerOrEl instanceof _El
 
-			@parent = sceneOrEl
+			@parent = layerOrEl
 
 		else
 
 			@parent = null
 
-		@_scene = sceneOrEl._scene
+		@_layer = layerOrEl._layer
+
+		@_scene = layerOrEl._scene
 
 		@_timing = @_scene.timing
 
