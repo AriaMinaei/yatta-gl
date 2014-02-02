@@ -1,6 +1,9 @@
-shaders = require './filter/shaders'
+HorizontalBoxBlur = require './filter/HorizontalBoxBlur'
+VerticalBoxBlur = require './filter/VerticalBoxBlur'
 NegativeEffect = require './filter/NegativeEffect'
 GlowEffect = require './filter/GlowEffect'
+DebugEffect = require './filter/DebugEffect'
+shaders = require './filter/shaders'
 
 rectangleVx = new Float32Array [
 	-1, -1,
@@ -38,7 +41,7 @@ module.exports = class Filter
 
 	addEffect: (effectName, reinitProgram = yes) ->
 
-		console.log self.effects
+		# console.log self.effects
 
 		fx = new self.effects[effectName] @, @_effects.length
 
@@ -99,6 +102,7 @@ module.exports = class Filter
 		frag += """
 		void main() {
 			vec4 color = texture2D(layerBeneath, vTexCoord);
+
 		"""
 
 		frag += fx._getFragBody() + "\n" for fx in @_effects
@@ -140,5 +144,8 @@ module.exports = class Filter
 
 		negative: NegativeEffect
 		glow: GlowEffect
+		verticalBlur: VerticalBoxBlur
+		horizontalBlur: HorizontalBoxBlur
+		debug: DebugEffect
 
 	self = @
