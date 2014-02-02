@@ -11,7 +11,7 @@ module.exports = class GlowEffect
 
 	_getFragBody: ->
 
-		"color = vec4(color.rgb / glow_#{@id}_intensity, color.w);"
+		"color = (1.0 + glow_#{@id}_intensity * vec4(smoothstep(0.0, 1.0, color.rgb), color.w)) * color;"
 
 	_useProgram: (p) ->
 
