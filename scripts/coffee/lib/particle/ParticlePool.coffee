@@ -16,17 +16,21 @@ module.exports = class ParticlePool extends _Pool
 
 		@_left = @count
 
-		do @_prepare
+		@_paramHolders = []
+
+		@painter = new ParticlePainter @_scene, @flags, @count
+
+		@_prepared = no
 
 	_prepare: ->
 
-		@_painter = new ParticlePainter @_scene, @flags, @count
+		@_prepared = yes
 
-		@_paramHolders = @_painter.getParamHolders()
+		@_paramHolders = @painter.getParamHolders()
 
 		for i in [0...@count]
 
-			el = new ParticleElement @_scene, @, @_painter, @_paramHolders[i], @flags
+			el = new ParticleElement @_scene, @, @painter, @_paramHolders[i], @flags
 
 			@_allElements.push el
 			@_remainingElements.push el
@@ -45,6 +49,8 @@ module.exports = class ParticlePool extends _Pool
 
 	get: ->
 
+		do @_prepare unless @_prepared
+
 		if @_left is 0
 
 			throw Error "All elements in the pool are already in use"
@@ -59,16 +65,20 @@ module.exports = class ParticlePool extends _Pool
 
 	replacePositionData: (newData) ->
 
-		@_painter.replacePositionData newData
+		@painter.replacePositionData newData
 
 		@
 
 	getBuffers: ->
 
+		do @_prepare unless @_prepared
+
 		@_paramHolders.__buffers
 
 	_redraw: ->
 
-		@_painter.paint @_paramHolders, @count
+		do @_prepare unless @_prepared
+
+		@painter.paint @_paramHolders, @count
 
 		return

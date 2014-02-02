@@ -1,9 +1,14 @@
 Esterakt = require 'esterakt'
 shaders = require './ParticlePainter/shaders'
+_Emitter = require '../utility/_Emitter'
 
-module.exports = class ParticlePainter
+_programCount = 0
+
+module.exports = class ParticlePainter extends _Emitter
 
 	constructor: (@_scene, @flags, @_count) ->
+
+		super
 
 		@_gila = @_scene._gila
 
@@ -23,39 +28,81 @@ module.exports = class ParticlePainter
 
 			@_vao = @_gila.extensions.vao.create()
 
-			@_vao.bind()
+		@_shouldInit = yes
 
-		do @_initProgram
+	_init: ->
 
-		do @_initUniforms
+		@_shouldInit = no
 
 		do @_initDataStructure
 
 		do @_initParamHolders
 
-		do @_initAttribs
-
-		@_vao.unbind()
+		do @_initProgram
 
 	_initProgram: ->
 
+		@_vao.bind()
+
 		flagsInCaps = {}
+
+		@_programId = _programCount++
 
 		for key, val of @flags
 
 			flagsInCaps[key.toUpperCase()] = val
 
-		vert = @_gila.getVertexShader 'particle-shader-vert',
+		{vertSource, fragSource} = @_getShadersSource()
 
-			shaders.vert, flagsInCaps
+		vert = @_gila.getVertexShader "particle-#{@_programId}-vert",
 
-		frag = @_gila.getFragmentShader 'particle-shader-frag',
+			vertSource, flagsInCaps
 
-			shaders.frag, flagsInCaps
+		frag = @_gila.getFragmentShader "particle-#{@_programId}-frag",
+
+			fragSource, flagsInCaps
 
 		@_program = @_gila.getProgram vert, frag
 
+		do @_initUniforms
+
+		do @_initAttribs
+
+		@_emit 'init-program'
+
+		@_vao.unbind()
+
 		return
+
+	_getShadersSource: ->
+
+		modofiers =
+
+			vert:
+
+				head: ""
+				prependBody: ""
+				appendBody: ""
+
+			frag:
+
+				head: ""
+				prependBody: ""
+				appendBody: ""
+
+		@_emit "init-shaders", modofiers
+
+		vertSource = shaders.vert
+		.replace(/\[\[head\]\]/, modofiers.vert.head)
+		.replace(/\[\[body-top\]\]/, modofiers.vert.prependBody)
+		.replace(/\[\[body-bottom\]\]/, modofiers.vert.appendBody)
+
+		fragSource = shaders.frag
+		.replace(/\[\[head\]\]/, modofiers.frag.head)
+		.replace(/\[\[body-top\]\]/, modofiers.frag.prependBody)
+		.replace(/\[\[body-bottom\]\]/, modofiers.frag.appendBody)
+
+		{vertSource, fragSource}
 
 	_initUniforms: ->
 
@@ -65,6 +112,20 @@ module.exports = class ParticlePainter
 
 			win: @_program.uniform('2f', 'win')
 			.set(@_scene._dims.perceivedWidth, @_scene._dims.perceivedHeight)
+
+		if @flags.fillWithImage
+
+			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
+
+		else if @flags.maskOnImage
+
+			@_uniforms.pictureAtlasUnit = @_program.uniform '1i', 'pictureAtlasUnit'
+
+		if @flags.maskWithImage
+
+			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
+
+		@_emit 'init-uniforms'
 
 		return
 
@@ -120,9 +181,6 @@ module.exports = class ParticlePainter
 			# The attribute to the coordinates of the image in the atlas
 			container.float 'fillWithImageCoords', 4
 
-			# We should enable the atlas
-			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
-
 		else if flags.maskOnImage
 
 			# These will be set in the element api
@@ -130,9 +188,6 @@ module.exports = class ParticlePainter
 
 			# The attribute to the coordinates of the image in the atlas
 			container.float 'maskOnImageCoords', 4
-
-			# We should enable the atlas
-			@_uniforms.pictureAtlasUnit = @_program.uniform '1i', 'pictureAtlasUnit'
 
 		else
 
@@ -148,10 +203,6 @@ module.exports = class ParticlePainter
 
 			# The attribute to specify which color channel should be used for the mask
 			container.float 'maskWithImageChannel', 1
-			# debugger
-
-			# We should enable the atlas
-			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
 		if flags.zRotation
 
@@ -161,11 +212,15 @@ module.exports = class ParticlePainter
 
 			container.float 'velocity', 2
 
+		@_emit 'init-dataStructure'
+
 	_initParamHolders: ->
 
 		@_holders = @_struct.makeParamHolders @_baseParams, @_count
 
 		@_uint8ViewOfPositionData = @_holders.__uint8Views.pos
+
+		@_emit 'init-paramHolders'
 
 		return
 
@@ -200,6 +255,8 @@ module.exports = class ParticlePainter
 		return
 
 	getParamHolders: ->
+
+		do @_init if @_shouldInit
 
 		@_holders
 
@@ -327,9 +384,13 @@ module.exports = class ParticlePainter
 
 	paint: ->
 
+		do @_init if @_shouldInit
+
 		@_vao.bind()
 
 		@_program.activate()
+
+		@_emit 'paint'
 
 		do @_wireBuffers
 

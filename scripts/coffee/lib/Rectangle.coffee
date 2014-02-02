@@ -39,17 +39,17 @@ module.exports = class Rectangle
 
 	_initProgram: ->
 
-		@_useVao = @_gila.extensions.vao.isAvailable()
+		# @_useVao = @_gila.extensions.vao.isAvailable()
 
-		unless @_useVao
+		# unless @_useVao
 
-			throw Error "Currently, we need OES_vertex_array_object extension to work"
+		# 	throw Error "Currently, we need OES_vertex_array_object extension to work"
 
-		else
+		# else
 
-			@_vao = @_gila.extensions.vao.create()
+		# 	@_vao = @_gila.extensions.vao.create()
 
-			@_vao.bind()
+		# 	@_vao.bind()
 
 		vert = @_gila.getVertexShader 'filter-rectangle-vert', shaders.vert
 
@@ -63,11 +63,11 @@ module.exports = class Rectangle
 
 		@_program.attr('vx').enable().readAsFloat 2, no, 8, 0
 
-		@_vao.unbind()
+		# @_vao.unbind()
 
 	_redraw: ->
 
-		@_vao.bind()
+		# @_vao.bind()
 
 		@_program.activate()
 
@@ -75,4 +75,4 @@ module.exports = class Rectangle
 
 		@_gila.drawTriangles 0, 6
 
-		@_vao.unbind()
+		# @_vao.unbind()

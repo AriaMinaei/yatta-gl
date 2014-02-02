@@ -1,5 +1,7 @@
 precision highp float;
 
+[[head]]
+
 uniform vec2 win;
 
 varying float vOpacity;
@@ -55,6 +57,8 @@ varying vec4 vTint;
 
 void main() {
 
+	[[body-top]]
+
 	vec2 pointCoord = gl_PointCoord;
 
 	#ifdef ZROTATION
@@ -94,5 +98,9 @@ void main() {
 
 	#endif
 
-	gl_FragColor = vec4(fillColor.rgb, fillColor[3] * opacityMult * vOpacity);
+	vec4 finalColor = vec4(fillColor.rgb, fillColor[3] * opacityMult * vOpacity);
+
+	[[body-bottom]]
+
+	gl_FragColor = finalColor;
 }

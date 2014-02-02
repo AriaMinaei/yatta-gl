@@ -1,5 +1,7 @@
 precision highp float;
 
+[[head]]
+
 attribute vec3 pos;
 
 attribute float size;
@@ -82,6 +84,8 @@ uniform vec2 win;
 
 void main(void) {
 
+	[[body-top]]
+
 	if (enabled == 0.0) return;
 
 	#ifdef MOTIONBLUR
@@ -127,6 +131,8 @@ void main(void) {
 	#endif
 
 	vec3 finalPosition = vec3(pos.xy / (win.xy / 2.0), pos.z);
+
+	[[body-bottom]]
 
 	gl_Position = vec4(finalPosition, 1);
 
