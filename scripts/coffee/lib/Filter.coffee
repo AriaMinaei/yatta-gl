@@ -41,7 +41,7 @@ module.exports = class Filter
 
 	addEffect: (effectName, reinitProgram = yes) ->
 
-		console.log self.effects
+		# console.log self.effects
 
 		fx = new self.effects[effectName] @, @_effects.length
 
@@ -69,7 +69,7 @@ module.exports = class Filter
 
 		vert = @_gila.getVertexShader 'filter-shader-vert', shaders.vert
 
-		console.log frag = @_getFragShader()
+		frag = @_getFragShader()
 
 		@_program = @_gila.getProgram vert, frag
 
