@@ -24,11 +24,11 @@ uniform vec2 win;
 	varying vec4 vFillWithImageCoords;
 
 // or mask it on an image
-#elif defined(MASKONIMAGE)
+#elif defined(MASKONFIXEDIMAGE)
 
-	attribute vec4 maskOnImageCoords;
+	attribute vec4 maskOnFixedImageCoords;
 
-	varying vec4 vMaskOnImageCoords;
+	varying vec4 vMaskOnFixedImageCoords;
 
 #else
 
@@ -112,9 +112,9 @@ void main(void) {
 
 		vFillWithImageCoords = fillWithImageCoords;
 
-	#elif defined(MASKONIMAGE)
+	#elif defined(MASKONFIXEDIMAGE)
 
-		vMaskOnImageCoords = maskOnImageCoords;
+		vMaskOnFixedImageCoords = maskOnFixedImageCoords;
 
 	#else
 

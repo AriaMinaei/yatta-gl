@@ -123,9 +123,9 @@ module.exports = class ParticleApi_
 
 		@
 
-	maskOnImage: (image) ->
+	maskOnFixedImage: (image) ->
 
-		@_painter.updateMaskOnImage @_params, image
+		@_painter.updateMaskOnFixedImage @_params, image
 
 		@
 

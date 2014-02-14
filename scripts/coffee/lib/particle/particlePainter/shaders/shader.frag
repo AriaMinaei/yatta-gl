@@ -16,9 +16,9 @@ varying vec4 vTint;
 
 	varying vec4 vFillWithImageCoords;
 
-#elif defined(MASKONIMAGE)
+#elif defined(MASKONFIXEDIMAGE)
 
-	varying vec4 vMaskOnImageCoords;
+	varying vec4 vMaskOnFixedImageCoords;
 
 	uniform sampler2D pictureAtlasUnit;
 
@@ -33,6 +33,14 @@ varying vec4 vTint;
 	varying vec4 vMaskWithImageCoords;
 
 	varying float vMaskWithImageChannel;
+
+#endif
+
+#if defined(MASKWITHFIXEDIMAGE)
+
+	varying float vMaskWithFixedImageCoords;
+
+	varying float vMaskWithFixedImageChannel;
 
 #endif
 
@@ -73,9 +81,9 @@ void main() {
 
 		// include ./frag/fillWithImage.frag
 
-	#elif defined(MASKONIMAGE)
+	#elif defined(MASKONFIXEDIMAGE)
 
-		// include ./frag/maskOnImage.frag
+		// include ./frag/maskOnFixedImage.frag
 
 	#else
 

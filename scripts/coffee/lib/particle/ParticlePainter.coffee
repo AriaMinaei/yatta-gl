@@ -117,7 +117,7 @@ module.exports = class ParticlePainter extends _Emitter
 
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
-		else if @flags.maskOnImage
+		else if @flags.maskOnFixedImage
 
 			@_uniforms.pictureAtlasUnit = @_program.uniform '1i', 'pictureAtlasUnit'
 
@@ -181,13 +181,13 @@ module.exports = class ParticlePainter extends _Emitter
 			# The attribute to the coordinates of the image in the atlas
 			container.float 'fillWithImageCoords', 4
 
-		else if flags.maskOnImage
+		else if flags.maskOnFixedImage
 
 			# These will be set in the element api
-			@_baseParams.maskOnImageProps = image: null
+			@_baseParams.maskOnFixedImageProps = image: null
 
 			# The attribute to the coordinates of the image in the atlas
-			container.float 'maskOnImageCoords', 4
+			container.float 'maskOnFixedImageCoords', 4
 
 		else
 
@@ -332,19 +332,23 @@ module.exports = class ParticlePainter extends _Emitter
 
 		return
 
-	updateMaskOnImage: (holder, image) ->
+	updateMaskOnFixedImage: (holder, url) ->
 
-		holder.maskOnImageProps.image = image
+		holder.maskOnFixedImageProps.image = url
 
 		# get atlas data of the element's image
-		image = @_scene.images.atlases.getImageData image
+		image = @_scene.images.get url
+
+		unless image.inAtlas
+
+			throw Error "All images associated with particles must be in an atlas"
 
 		# prepare the atls texture, if it's not already
-		@_preparePictureAtlasTexture image.atlasUrl
+		@_preparePictureAtlasTexture image
 
 		# the shader needs to know the coordinates of the image
 		# in the shader atlas
-		holder.maskOnImageCoords.set image.coords
+		holder.maskOnFixedImageCoords.set image.coords
 
 		return
 
@@ -402,4 +406,4 @@ module.exports = class ParticlePainter extends _Emitter
 
 		return
 
-	@possibleFlags: ['fillWithImage', 'maskWithImage', 'maskOnImage', 'tint', 'blending', 'zRotation', 'motionBlur']
+	@possibleFlags: ['fillWithImage', 'maskWithImage', 'maskOnFixedImage', 'tint', 'blending', 'zRotation', 'motionBlur']
