@@ -74,6 +74,19 @@ uniform vec2 win;
 
 #endif
 
+#ifdef MASKWITHFIXEDIMAGE
+
+	attribute vec4 maskWithFixedImageCoords;
+
+	varying vec4 vMaskWithFixedImageCoords;
+
+	// as an opacity mask
+	attribute float maskWithFixedImageChannel;
+
+	varying float vMaskWithFixedImageChannel;
+
+#endif
+
 #ifdef MOTIONBLUR
 
 	attribute vec2 velocity;
@@ -127,6 +140,14 @@ void main(void) {
 		vMaskWithImageCoords = maskWithImageCoords;
 
 		vMaskWithImageChannel = maskWithImageChannel;
+
+	#endif
+
+	#if defined(MASKWITHFIXEDIMAGE)
+
+		vMaskWithFixedImageCoords = maskWithFixedImageCoords;
+
+		vMaskWithFixedImageChannel = maskWithFixedImageChannel;
 
 	#endif
 

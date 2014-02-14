@@ -135,6 +135,12 @@ module.exports = class ParticleApi_
 
 		@
 
+	maskWithFixedImage: (image, channel = 4) ->
+
+		@_painter.updateMaskWithFixedImage @_params, image, channel
+
+		@
+
 	tint: (r, g, b, intensity) ->
 
 		@_params.tint[0] = r

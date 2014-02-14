@@ -36,9 +36,10 @@ varying vec4 vTint;
 
 #endif
 
+
 #if defined(MASKWITHFIXEDIMAGE)
 
-	varying float vMaskWithFixedImageCoords;
+	varying vec4 vMaskWithFixedImageCoords;
 
 	varying float vMaskWithFixedImageChannel;
 
@@ -51,7 +52,7 @@ varying vec4 vTint;
 #endif
 
 
-#if defined(FILLWITHIMAGE) || defined(MASKWITHIMAGE)
+#if defined(FILLWITHIMAGE) || defined(MASKWITHIMAGE) || defined(MASKWITHFIXEDIMAGE)
 
 	uniform sampler2D imageAtlasUnit;
 
@@ -77,6 +78,11 @@ void main() {
 
 	vec2 clipCoord = vec2((gl_FragCoord.x / win.x) - 0.5, (gl_FragCoord.y / win.y) - 0.5) * vec2(2.0);
 
+	vec2 coordOnMask = vec2(
+		clipCoord.x / 2.0 + 0.5,
+		clipCoord.y / -2.0 + 0.5
+	);
+
 	#ifdef FILLWITHIMAGE
 
 		// include ./frag/fillWithImage.frag
@@ -92,6 +98,13 @@ void main() {
 	#endif
 
 	float opacityMult = 1.0;
+
+	// masking with an image
+	#ifdef MASKWITHFIXEDIMAGE
+
+		// include ./frag/maskWithFixedImage.frag
+
+	#endif
 
 	// masking with an image
 	#ifdef MASKWITHIMAGE

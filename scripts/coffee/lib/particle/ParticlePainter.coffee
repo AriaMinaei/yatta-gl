@@ -121,7 +121,7 @@ module.exports = class ParticlePainter extends _Emitter
 
 			@_uniforms.pictureAtlasUnit = @_program.uniform '1i', 'pictureAtlasUnit'
 
-		if @flags.maskWithImage
+		if @flags.maskWithImage or @flags.maskWithFixedImage
 
 			@_uniforms.imageAtlasUnit = @_program.uniform '1i', 'imageAtlasUnit'
 
@@ -203,6 +203,17 @@ module.exports = class ParticlePainter extends _Emitter
 
 			# The attribute to specify which color channel should be used for the mask
 			container.float 'maskWithImageChannel', 1
+
+		if flags.maskWithFixedImage
+
+			# These will be set in the element api
+			@_baseParams.maskWithFixedImageProps = image: null, channel: 0
+
+			# The attribute to the coordinates of the image in the atlas
+			container.float 'maskWithFixedImageCoords', 4
+
+			# The attribute to specify which color channel should be used for the mask
+			container.float 'maskWithFixedImageChannel', 1
 
 		if flags.zRotation
 
@@ -378,6 +389,32 @@ module.exports = class ParticlePainter extends _Emitter
 
 		return
 
+	updateMaskWithFixedImage: (holder, url, channel) ->
+
+		holder.maskWithFixedImageProps.image = url
+
+		channel = parseInt(channel) || 0
+
+		holder.maskWithFixedImageProps.channel = channel
+
+		# get atlas data of the element's image
+		image = @_scene.images.get url
+
+		unless image.inAtlas
+
+			throw Error "All images associated with particles must be in an atlas"
+
+		# prepare the atls texture, if it's not already
+		@_prepareImageAtlasTexture image
+
+		# the shader needs to know the coordinates of the image
+		# in the shader atlas
+		holder.maskWithFixedImageCoords.set image.coords
+
+		holder.maskWithFixedImageChannel[0] = channel
+
+		return
+
 	_wireBuffers: ->
 
 		for name, buffer of @_buffers
@@ -406,4 +443,13 @@ module.exports = class ParticlePainter extends _Emitter
 
 		return
 
-	@possibleFlags: ['fillWithImage', 'maskWithImage', 'maskOnFixedImage', 'tint', 'blending', 'zRotation', 'motionBlur']
+	@possibleFlags: [
+		'fillWithImage'
+		'maskWithImage'
+		'maskOnFixedImage'
+		'maskWithFixedImage'
+		'tint'
+		'blending'
+		'zRotation'
+		'motionBlur'
+	]
