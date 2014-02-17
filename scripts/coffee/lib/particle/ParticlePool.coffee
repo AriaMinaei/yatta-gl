@@ -1,5 +1,6 @@
 ParticleElement = require './ParticleElement'
 ParticlePainter = require './ParticlePainter'
+ParticleGroup = require './ParticleGroup'
 _Pool = require '../_Pool'
 
 module.exports = class ParticlePool extends _Pool
@@ -63,6 +64,16 @@ module.exports = class ParticlePool extends _Pool
 
 		el
 
+	getRest: ->
+
+		do @_prepare unless @_prepared
+
+		loop
+
+			break if @_left is 0
+
+			@get()
+
 	replacePositionData: (newData) ->
 
 		@painter.replacePositionData newData
@@ -82,3 +93,5 @@ module.exports = class ParticlePool extends _Pool
 		@painter.paint @_paramHolders, @count
 
 		return
+
+	@Group: ParticleGroup
